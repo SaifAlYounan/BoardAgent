@@ -1,0 +1,53 @@
+{
+  "ruleset_id": "01993500-0000-7000-8000-000000000003",
+  "board_id": "01993500-0000-7000-8000-000000000002",
+  "profile_id": "01993500-0000-7000-8000-000000000001",
+  "version": 1,
+  "state": "draft",
+  "schema_version": "boardagent.ruleset.v1",
+  "canonical_payload": {
+    "facts": {
+      "text": "Synthetic Δ 🙂"
+    },
+    "zero": 0
+  },
+  "sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "supersedes_id": null,
+  "rules": [
+    {
+      "rule_id": "01993500-0000-7000-8000-000000000004",
+      "matter_type_id": "01993500-0000-7000-8000-000000000006",
+      "priority": 10,
+      "specificity": 2,
+      "condition": {
+        "all": [
+          {
+            "fact": "amount",
+            "gt": 1e-7
+          }
+        ],
+        "nested": {}
+      },
+      "approval_rule_id": "01993500-0000-7000-8000-000000000007",
+      "sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc"
+    },
+    {
+      "rule_id": "01993500-0000-7000-8000-000000000005",
+      "matter_type_id": "01993500-0000-7000-8000-000000000006",
+      "priority": 3,
+      "specificity": 1,
+      "condition": {
+        "any": [
+          {
+            "fact": "eligible",
+            "equals": true
+          }
+        ]
+      },
+      "approval_rule_id": "01993500-0000-7000-8000-000000000007",
+      "sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
+    }
+  ],
+  "created_at": "2026-09-12T11:00:00.000000Z",
+  "activated_at": null
+}

@@ -1,0 +1,18 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "dist",
+    "tsBuildInfoFile": "dist/.tsbuildinfo"
+  },
+  "references": [
+    { "path": "../../lib/contracts" },
+    { "path": "../../lib/domain" },
+    { "path": "../../lib/ruleset" },
+    { "path": "../../lib/audit" },
+    { "path": "../../lib/authz" },
+    { "path": "../../lib/config" },
+    { "path": "../../lib/db" }
+  ],
+  "include": ["src/**/*.ts"]
+}

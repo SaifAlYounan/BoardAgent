@@ -1,0 +1,17 @@
+{
+  "name": "@boardagent/scripts",
+  "version": "0.0.0-private-beta",
+  "license": "Apache-2.0",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@boardagent/audit": "workspace:*",
+    "@boardagent/config": "workspace:*",
+    "@boardagent/contracts": "workspace:*",
+    "@boardagent/db": "workspace:*",
+    "@boardagent/domain": "workspace:*",
+    "@boardagent/server": "workspace:*",
+    "pg": "8.23.0",
+    "zod": "4.4.3"
+  }
+}

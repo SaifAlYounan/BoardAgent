@@ -1,0 +1,2711 @@
+{
+  "registryDigest": "d15e9d9f145589aaa513d560fed8fc7e234b1635a6c15ec5637d949b133a3f57",
+  "registry": {
+    "schemaVersion": "boardagent.registry.v1",
+    "sources": {
+      "surfaceMatrix": "planning/gate2/gate2/SURFACE-AUTHORITY-EVENT-MATRIX.md",
+      "surfaceMatrixSha256": "a53bc820a15ea1fd0472678626eac04922213b1cc658327c113d795622ce5b7c",
+      "verificationMatrix": "planning/gate2/gate2/VERIFICATION-AND-RELEASE-NET.md",
+      "verificationMatrixSha256": "2759dbd068827cb0f001a5c0c38047399f8821e2ff58139f91424a61013f85df",
+      "amendment": {
+        "id": "administrative-authority-20260906-v1",
+        "path": "docs/decisions/access-control-amendment-v1.json",
+        "sha256": "20af9fbc08eaa829fe2fdbc87ff730edd029d85e5d86b26a656e16648dfea3f4",
+        "authorizationPath": "docs/decisions/access-control-implementation-authorization.md",
+        "authorizationSha256": "72d871745cc9e9650a9804704e0a8db3d4174319a177ee24586c1e7218839011"
+      },
+      "onboardingAmendment": {
+        "id": "onboarding-publication-20260910-v1",
+        "path": "docs/decisions/onboarding-publication-amendment-v1.json",
+        "sha256": "6cd9e5b9fc9cb37867beec317e4ebf476e01f8a67f079d9d7e07e2632fe2b6ed",
+        "instructionPath": "docs/decisions/onboarding-publication-implementation-2026-09-10.md",
+        "instructionSha256": "74ac5ee7f76ec7ea64ce88f7d613b38b674ee48bc2c78429d002bb99ecab1195",
+        "parentRegistryDigest": "1362f5dece04d2af4a76216d4eb3c4f37aa316a052178d5380518123f7becf7a"
+      },
+      "operationalAmendment": {
+        "id": "operational-maintenance-20260909-v1",
+        "path": "docs/decisions/operational-maintenance-amendment-v1.json",
+        "sha256": "3d4547a933ae8c2095b8dac9d603a8a20a5f5d26a6a204e2e411cede1f18de4d",
+        "instructionPath": "docs/decisions/operational-completion-instruction-2026-09-08.md",
+        "instructionSha256": "e8fe4b97ff50c76f601825c81e0edd2c53575a267178c0ccbd412c7139e555e1",
+        "parentRegistryDigest": "7a8607647c451c6594c09a34f6ad7c0a9e80d91a75295ce5bf092a53035878bc"
+      },
+      "activationRestartAmendment": {
+        "id": "activation-restart-20260913-v1",
+        "path": "docs/decisions/activation-restart-amendment-v1.json",
+        "sha256": "626249f99591bb7b5a09025f80340258c579b693e7968275811c25bb1f85789e",
+        "instructionPath": "docs/decisions/activation-restart-proposal-2026-09-13.md",
+        "instructionSha256": "9a0cd82e6ba260dbb42fda33c1cc799b9101cddc2a114d50d66c9dea31ac3092",
+        "parentRegistryDigest": "c5318e35629312133a4e7d55df9cde7b0bcb15f205e55542927033af7754d920"
+      }
+    },
+    "tools": [
+      {
+        "name": "whoami",
+        "class": "R",
+        "section": "Context, onboarding and synchronized edge memory",
+        "requiredAuthority": "authenticated or enrollment-limited token",
+        "objectRule": "own identity only",
+        "requiredEvidence": "safe identity/role/session view; `context_read`"
+      },
+      {
+        "name": "list_my_boards",
+        "class": "R",
+        "section": "Context, onboarding and synchronized edge memory",
+        "requiredAuthority": "`G:R`",
+        "objectRule": "active memberships only",
+        "requiredEvidence": "entitlement-filtered list; no hidden counts"
+      },
+      {
+        "name": "get_board",
+        "class": "R",
+        "section": "Context, onboarding and synchronized edge memory",
+        "requiredAuthority": "`G:R`",
+        "objectRule": "active membership on board",
+        "requiredEvidence": "`resource_fetch` for canonical board metadata"
+      },
+      {
+        "name": "get_my_board_snapshot",
+        "class": "R",
+        "section": "Context, onboarding and synchronized edge memory",
+        "requiredAuthority": "`G:R`",
+        "objectRule": "one active board membership",
+        "requiredEvidence": "bounded metadata/resource references, cursor and entitlement generation"
+      },
+      {
+        "name": "list_my_updates",
+        "class": "R",
+        "section": "Context, onboarding and synchronized edge memory",
+        "requiredAuthority": "`G:R`",
+        "objectRule": "caller-bound signed cursor",
+        "requiredEvidence": "deltas/tombstones only; cursor tamper is a safe denial"
+      },
+      {
+        "name": "list_pending_actions",
+        "class": "R",
+        "section": "Context, onboarding and synchronized edge memory",
+        "requiredAuthority": "`G:R`",
+        "objectRule": "own entitled objects only",
+        "requiredEvidence": "one-call briefing; `revote_required` resolves only by accepted new-vote ballot, terminal/replacement vote, or eligibility loss; includes `minutes_resign_required` until current signature/terminal package"
+      },
+      {
+        "name": "get_onboarding",
+        "class": "R",
+        "section": "Context, onboarding and synchronized edge memory",
+        "requiredAuthority": "`O:R`",
+        "objectRule": "own role and current terms version",
+        "requiredEvidence": "canonical terms, secretary support details and presentation/local-memory questions"
+      },
+      {
+        "name": "get_onboarding_status",
+        "class": "R",
+        "section": "Context, onboarding and synchronized edge memory",
+        "requiredAuthority": "`O:R`",
+        "objectRule": "own attestation only",
+        "requiredEvidence": "current/stale/required state; no other member status"
+      },
+      {
+        "name": "prepare_onboarding_attestation",
+        "class": "H",
+        "section": "Context, onboarding and synchronized edge memory",
+        "requiredAuthority": "`O:R`; browser recent-auth completion",
+        "objectRule": "own current exact terms",
+        "requiredEvidence": "`onboarding_stage_created`, `onboarding_attested`; no comprehension claim"
+      },
+      {
+        "name": "create_board",
+        "class": "H",
+        "section": "Boards, charter profile and rulesets",
+        "requiredAuthority": "admin + `S:A`",
+        "objectRule": "organization singleton",
+        "requiredEvidence": "`board_created`; creates no implicit seats"
+      },
+      {
+        "name": "update_board",
+        "class": "H",
+        "section": "Boards, charter profile and rulesets",
+        "requiredAuthority": "admin + `S:A`",
+        "objectRule": "nonterminal board",
+        "requiredEvidence": "immutable settings version; `board_amended`"
+      },
+      {
+        "name": "archive_board",
+        "class": "H",
+        "section": "Boards, charter profile and rulesets",
+        "requiredAuthority": "admin + `S:A`",
+        "objectRule": "no open governance action",
+        "requiredEvidence": "visibility-only terminal transition; `board_archived`"
+      },
+      {
+        "name": "get_board_governance_profile",
+        "class": "R",
+        "section": "Boards, charter profile and rulesets",
+        "requiredAuthority": "`G:R`",
+        "objectRule": "board membership",
+        "requiredEvidence": "active version/hash and cited source clauses"
+      },
+      {
+        "name": "list_approval_rule_templates",
+        "class": "R",
+        "section": "Boards, charter profile and rulesets",
+        "requiredAuthority": "`G:R`",
+        "objectRule": "board membership",
+        "requiredEvidence": "only active-profile permitted templates"
+      },
+      {
+        "name": "configure_board_governance",
+        "class": "H",
+        "section": "Boards, charter profile and rulesets",
+        "requiredAuthority": "admin + `S:A`",
+        "objectRule": "cited machine-readable charter sources",
+        "requiredEvidence": "immutable activated profile; `governance_profile_activated`"
+      },
+      {
+        "name": "list_matter_types",
+        "class": "R",
+        "section": "Boards, charter profile and rulesets",
+        "requiredAuthority": "`G:R`",
+        "objectRule": "board membership",
+        "requiredEvidence": "active ruleset types/citations"
+      },
+      {
+        "name": "evaluate_matter",
+        "class": "D",
+        "section": "Boards, charter profile and rulesets",
+        "requiredAuthority": "secretary/admin + `S:A`",
+        "objectRule": "entitled board and strict typed facts",
+        "requiredEvidence": "persisted reproducible evaluation; `matter_evaluated`"
+      },
+      {
+        "name": "get_ruleset",
+        "class": "R",
+        "section": "Boards, charter profile and rulesets",
+        "requiredAuthority": "`G:R`",
+        "objectRule": "board membership",
+        "requiredEvidence": "exact version/canonical hash/citations"
+      },
+      {
+        "name": "list_ruleset_versions",
+        "class": "R",
+        "section": "Boards, charter profile and rulesets",
+        "requiredAuthority": "`G:R`",
+        "objectRule": "board membership",
+        "requiredEvidence": "immutable visible version history"
+      },
+      {
+        "name": "validate_ruleset_draft",
+        "class": "R",
+        "section": "Boards, charter profile and rulesets",
+        "requiredAuthority": "admin/secretary + `S:A`",
+        "objectRule": "owned draft",
+        "requiredEvidence": "deterministic validation only; no activation"
+      },
+      {
+        "name": "manage_ruleset",
+        "class": "H",
+        "section": "Boards, charter profile and rulesets",
+        "requiredAuthority": "admin + `S:A`",
+        "objectRule": "exact version/citations and no ambiguity",
+        "requiredEvidence": "`ruleset_amended`; activation/override package is confirmed"
+      },
+      {
+        "name": "list_documents",
+        "class": "R",
+        "section": "Canonical documents and circulation",
+        "requiredAuthority": "`D:R`",
+        "objectRule": "SQL entitlement predicate before count/page",
+        "requiredEvidence": "no excluded existence, count or cursor leak"
+      },
+      {
+        "name": "read_document",
+        "class": "R",
+        "section": "Canonical documents and circulation",
+        "requiredAuthority": "`D:R`",
+        "objectRule": "exact document/version ACL and no exclusion",
+        "requiredEvidence": "exact canonical bytes plus two-phase `resource_fetch`"
+      },
+      {
+        "name": "search_documents",
+        "class": "R",
+        "section": "Canonical documents and circulation",
+        "requiredAuthority": "`D:R`",
+        "objectRule": "visibility predicate before rank/snippet/count",
+        "requiredEvidence": "deterministic PostgreSQL FTS; no server embeddings"
+      },
+      {
+        "name": "get_document_hash",
+        "class": "R",
+        "section": "Canonical documents and circulation",
+        "requiredAuthority": "`D:R`",
+        "objectRule": "exact version access",
+        "requiredEvidence": "SHA-256/media/schema/length only"
+      },
+      {
+        "name": "list_document_versions",
+        "class": "R",
+        "section": "Canonical documents and circulation",
+        "requiredAuthority": "`D:R`",
+        "objectRule": "document access",
+        "requiredEvidence": "immutable entitled versions only"
+      },
+      {
+        "name": "get_document_validation_status",
+        "class": "R",
+        "section": "Canonical documents and circulation",
+        "requiredAuthority": "contributor or `D:R`",
+        "objectRule": "own contribution or entitled document",
+        "requiredEvidence": "loud accepted/rejected reason and remediation"
+      },
+      {
+        "name": "create_document_version",
+        "class": "D",
+        "section": "Canonical documents and circulation",
+        "requiredAuthority": "management/secretary + `D:C`",
+        "objectRule": "board contribution rights; strict MD/TXT/JSON only",
+        "requiredEvidence": "reject unsupported bytes before durable content; `document_version_created`"
+      },
+      {
+        "name": "circulate_document",
+        "class": "H",
+        "section": "Canonical documents and circulation",
+        "requiredAuthority": "secretary + `S:A`",
+        "objectRule": "accepted immutable version and recipient ACL",
+        "requiredEvidence": "`document_circulated` plus one `notice_delivered` per recipient"
+      },
+      {
+        "name": "manage_document_access",
+        "class": "H",
+        "section": "Canonical documents and circulation",
+        "requiredAuthority": "secretary/admin + `S:A`",
+        "objectRule": "board-bound grants; deny-wins exclusions",
+        "requiredEvidence": "`document_access_changed` and removal tombstones"
+      },
+      {
+        "name": "manage_recusal",
+        "class": "H",
+        "section": "Canonical documents and circulation",
+        "requiredAuthority": "secretary/admin + `S:A`",
+        "objectRule": "named board/person/object or live vote exclusion",
+        "requiredEvidence": "`recusal_changed`; invalidations/recalculation under aggregate lock"
+      },
+      {
+        "name": "archive_document",
+        "class": "H",
+        "section": "Canonical documents and circulation",
+        "requiredAuthority": "secretary/admin + `S:A`",
+        "objectRule": "no rewrite/delete",
+        "requiredEvidence": "`document_archived`; normal listings hide it"
+      },
+      {
+        "name": "soft_delete_document",
+        "class": "H",
+        "section": "Canonical documents and circulation",
+        "requiredAuthority": "admin + `S:A`",
+        "objectRule": "snapshot first; no physical purge",
+        "requiredEvidence": "`document_soft_deleted`, permanent tombstone and feed removals"
+      },
+      {
+        "name": "submit_document_to_secretariat",
+        "class": "D",
+        "section": "Management-to-secretariat submissions",
+        "requiredAuthority": "management + `D:C`",
+        "objectRule": "own board; accepted document versions only",
+        "requiredEvidence": "immutable submission version/thread; `management_submission_created`"
+      },
+      {
+        "name": "list_management_submissions",
+        "class": "R",
+        "section": "Management-to-secretariat submissions",
+        "requiredAuthority": "management/secretary + `G:R`",
+        "objectRule": "own submissions or secretary board queue",
+        "requiredEvidence": "entitlement-filtered queue"
+      },
+      {
+        "name": "get_management_submission",
+        "class": "R",
+        "section": "Management-to-secretariat submissions",
+        "requiredAuthority": "management/secretary + `G:R`",
+        "objectRule": "exact thread access",
+        "requiredEvidence": "versions, replies and disposition lineage"
+      },
+      {
+        "name": "request_management_revision",
+        "class": "D",
+        "section": "Management-to-secretariat submissions",
+        "requiredAuthority": "secretary + `S:A`",
+        "objectRule": "submitted thread",
+        "requiredEvidence": "immutable request; `management_revision_requested`"
+      },
+      {
+        "name": "reply_to_management_revision",
+        "class": "D",
+        "section": "Management-to-secretariat submissions",
+        "requiredAuthority": "submitting management + `D:C`",
+        "objectRule": "own thread",
+        "requiredEvidence": "immutable reply; `management_revision_replied`"
+      },
+      {
+        "name": "resubmit_management_materials",
+        "class": "D",
+        "section": "Management-to-secretariat submissions",
+        "requiredAuthority": "submitting management + `D:C`",
+        "objectRule": "new immutable accepted document/submission version",
+        "requiredEvidence": "`management_submission_version_created`; linked vote enters pending-source state"
+      },
+      {
+        "name": "approve_management_submission",
+        "class": "D",
+        "section": "Management-to-secretariat submissions",
+        "requiredAuthority": "secretary + `S:A`",
+        "objectRule": "submitted version",
+        "requiredEvidence": "creates confirmable draft only; `management_submission_approved_to_draft`"
+      },
+      {
+        "name": "reject_management_submission",
+        "class": "D",
+        "section": "Management-to-secretariat submissions",
+        "requiredAuthority": "secretary + `S:A`",
+        "objectRule": "submitted version; reason required",
+        "requiredEvidence": "`management_submission_rejected`; no deletion"
+      },
+      {
+        "name": "ask_management",
+        "class": "D",
+        "section": "Permanent questions to management",
+        "requiredAuthority": "voting member **or observer** + `MQ`",
+        "objectRule": "entitled board, ACL-safe citations, responsible owner and due time",
+        "requiredEvidence": "immutable question; `management_question_asked`; management pending action"
+      },
+      {
+        "name": "list_management_questions",
+        "class": "R",
+        "section": "Permanent questions to management",
+        "requiredAuthority": "`G:R`",
+        "objectRule": "visible threads only; role/ACL/recusal filter before count",
+        "requiredEvidence": "pending/overdue/answered state without hidden totals"
+      },
+      {
+        "name": "get_management_question",
+        "class": "R",
+        "section": "Permanent questions to management",
+        "requiredAuthority": "`G:R`",
+        "objectRule": "visible exact thread",
+        "requiredEvidence": "immutable turns/citations/delivery lineage"
+      },
+      {
+        "name": "answer_management_question",
+        "class": "D",
+        "section": "Permanent questions to management",
+        "requiredAuthority": "assigned management + `MQ`",
+        "objectRule": "pending/overdue visible thread; nonblank answer",
+        "requiredEvidence": "immutable answer; `management_question_answered`; cannot answer by status flip; a new turn beyond an open linked package cutoff enters source-update pending"
+      },
+      {
+        "name": "follow_up_management_question",
+        "class": "D",
+        "section": "Permanent questions to management",
+        "requiredAuthority": "entitled voting member **or observer** + `MQ`",
+        "objectRule": "visible thread",
+        "requiredEvidence": "immutable follow-up; `management_question_followed_up`; reopens management action and, only when thread is linked to an open package, source-update pending"
+      },
+      {
+        "name": "list_meetings",
+        "class": "R",
+        "section": "Meetings, agendas and attendance",
+        "requiredAuthority": "`G:R`",
+        "objectRule": "board membership and ACL",
+        "requiredEvidence": "entitled meetings only"
+      },
+      {
+        "name": "get_agenda",
+        "class": "R",
+        "section": "Meetings, agendas and attendance",
+        "requiredAuthority": "`G:R`",
+        "objectRule": "meeting/agenda/document access",
+        "requiredEvidence": "exact immutable agenda version/resources"
+      },
+      {
+        "name": "rsvp",
+        "class": "D",
+        "section": "Meetings, agendas and attendance",
+        "requiredAuthority": "nonobserver board seat + `MT:A`",
+        "objectRule": "called, nonterminal meeting and own response",
+        "requiredEvidence": "append/update with history; `meeting_rsvp_recorded`"
+      },
+      {
+        "name": "get_attendance",
+        "class": "R",
+        "section": "Meetings, agendas and attendance",
+        "requiredAuthority": "`G:R`",
+        "objectRule": "board membership",
+        "requiredEvidence": "recorded evidence; never inferred from RSVP"
+      },
+      {
+        "name": "create_meeting",
+        "class": "H",
+        "section": "Meetings, agendas and attendance",
+        "requiredAuthority": "secretary + `S:A`",
+        "objectRule": "final canonical package from guided draft",
+        "requiredEvidence": "`meeting_called` plus one recipient notice"
+      },
+      {
+        "name": "amend_meeting",
+        "class": "H",
+        "section": "Meetings, agendas and attendance",
+        "requiredAuthority": "secretary + `S:A`",
+        "objectRule": "called/nonterminal; immutable replacement version",
+        "requiredEvidence": "`meeting_amended`; stale stages invalidated and recipients re-noticed"
+      },
+      {
+        "name": "record_attendance",
+        "class": "D",
+        "section": "Meetings, agendas and attendance",
+        "requiredAuthority": "secretary + `S:A`",
+        "objectRule": "called/completed meeting and listed participant",
+        "requiredEvidence": "`meeting_attendance_recorded`; correction uses a new record"
+      },
+      {
+        "name": "correct_attendance",
+        "class": "H",
+        "section": "Meetings, agendas and attendance",
+        "requiredAuthority": "secretary + `S:A`",
+        "objectRule": "exact prior record and reason",
+        "requiredEvidence": "linked correction; `meeting_attendance_corrected`"
+      },
+      {
+        "name": "cancel_meeting",
+        "class": "H",
+        "section": "Meetings, agendas and attendance",
+        "requiredAuthority": "secretary + `S:A`",
+        "objectRule": "nonterminal meeting",
+        "requiredEvidence": "`meeting_cancelled`; terminal and re-noticed"
+      },
+      {
+        "name": "complete_meeting",
+        "class": "H",
+        "section": "Meetings, agendas and attendance",
+        "requiredAuthority": "secretary + `S:A`",
+        "objectRule": "called meeting",
+        "requiredEvidence": "`meeting_completed`; terminal evidence snapshot"
+      },
+      {
+        "name": "list_meeting_transcripts",
+        "class": "R",
+        "section": "Machine-readable transcript annexes",
+        "requiredAuthority": "`G:R`",
+        "objectRule": "meeting access",
+        "requiredEvidence": "versions and loud verification state"
+      },
+      {
+        "name": "get_meeting_transcript",
+        "class": "R",
+        "section": "Machine-readable transcript annexes",
+        "requiredAuthority": "`G:R`",
+        "objectRule": "meeting/transcript ACL",
+        "requiredEvidence": "canonical MD/strict-JSON turns; `resource_fetch`"
+      },
+      {
+        "name": "create_meeting_transcript_version",
+        "class": "D",
+        "section": "Machine-readable transcript annexes",
+        "requiredAuthority": "secretary + `S:A`",
+        "objectRule": "meeting; machine-readable text only",
+        "requiredEvidence": "immutable `agent_prepared_unverified` annex; `transcript_version_created`"
+      },
+      {
+        "name": "verify_meeting_transcript",
+        "class": "H",
+        "section": "Machine-readable transcript annexes",
+        "requiredAuthority": "secretary + `S:A`",
+        "objectRule": "exact annex hash/version",
+        "requiredEvidence": "`transcript_secretary_verified`; no claim about original audio"
+      },
+      {
+        "name": "link_meeting_qna",
+        "class": "H",
+        "section": "Machine-readable transcript annexes",
+        "requiredAuthority": "secretary + `S:A`",
+        "objectRule": "exact transcript turns and D2-062 threads",
+        "requiredEvidence": "immutable link; `transcript_qna_linked`; unanswered turns create management actions"
+      },
+      {
+        "name": "challenge_transcript_turn",
+        "class": "D",
+        "section": "Machine-readable transcript annexes",
+        "requiredAuthority": "entitled nonobserver participant + `S:M`",
+        "objectRule": "exact visible turn",
+        "requiredEvidence": "immutable challenge; `transcript_turn_challenged`"
+      },
+      {
+        "name": "resolve_transcript_challenge",
+        "class": "H",
+        "section": "Machine-readable transcript annexes",
+        "requiredAuthority": "secretary + `S:A`",
+        "objectRule": "challenge plus corrected new version",
+        "requiredEvidence": "`transcript_challenge_resolved`; never rewrites old turn"
+      },
+      {
+        "name": "list_votes",
+        "class": "R",
+        "section": "Votes, proxies and certificates",
+        "requiredAuthority": "`G:R`",
+        "objectRule": "board membership and tally-visibility policy",
+        "requiredEvidence": "no hidden vote/statement/interim-count leak"
+      },
+      {
+        "name": "get_vote",
+        "class": "R",
+        "section": "Votes, proxies and certificates",
+        "requiredAuthority": "`G:R`",
+        "objectRule": "exact vote access",
+        "requiredEvidence": "canonical package/hash/rule and authorized tally state"
+      },
+      {
+        "name": "get_vote_lineage",
+        "class": "R",
+        "section": "Votes, proxies and certificates",
+        "requiredAuthority": "`G:R`",
+        "objectRule": "access to linked votes",
+        "requiredEvidence": "draft/open/superseded/replacement IDs and hashes"
+      },
+      {
+        "name": "stage_ballot",
+        "class": "H",
+        "section": "Votes, proxies and certificates",
+        "requiredAuthority": "eligible voting seat + `V:A`",
+        "objectRule": "open, unrecused, current package; own or valid proxy principal",
+        "requiredEvidence": "MRTR confirmation; `stage_created`, `elicitation_sent`, `consent_recorded`, `ballot_cast`"
+      },
+      {
+        "name": "grant_proxy",
+        "class": "H",
+        "section": "Votes, proxies and certificates",
+        "requiredAuthority": "eligible principal + `P:M`",
+        "objectRule": "open vote, permitted holder, no chain/cycle",
+        "requiredEvidence": "`proxy_granted`; no pre-consent grant row"
+      },
+      {
+        "name": "revoke_proxy",
+        "class": "H",
+        "section": "Votes, proxies and certificates",
+        "requiredAuthority": "principal + `P:M`",
+        "objectRule": "own active grant and frozen policy",
+        "requiredEvidence": "`proxy_revoked`; effects explicit/audited"
+      },
+      {
+        "name": "get_proxy_status",
+        "class": "R",
+        "section": "Votes, proxies and certificates",
+        "requiredAuthority": "principal/holder/secretary + `G:R`",
+        "objectRule": "exact vote and relationship",
+        "requiredEvidence": "safe attribution/status only"
+      },
+      {
+        "name": "get_vote_certificate",
+        "class": "R",
+        "section": "Votes, proxies and certificates",
+        "requiredAuthority": "`G:R` or `A:R`",
+        "objectRule": "board-authorized vote",
+        "requiredEvidence": "persisted recomputed bundle and signature"
+      },
+      {
+        "name": "verify_certificate",
+        "class": "R",
+        "section": "Votes, proxies and certificates",
+        "requiredAuthority": "authenticated",
+        "objectRule": "supplied/visible certificate",
+        "requiredEvidence": "persisted-data recomputation; generic reason class"
+      },
+      {
+        "name": "create_vote",
+        "class": "H",
+        "section": "Votes, proxies and certificates",
+        "requiredAuthority": "secretary + `S:A`",
+        "objectRule": "completed guided package/profile-permitted rule",
+        "requiredEvidence": "`vote_opened`, package/electorate freeze, per-member notices"
+      },
+      {
+        "name": "amend_resolution_text",
+        "class": "H",
+        "section": "Votes, proxies and certificates",
+        "requiredAuthority": "secretary + `S:A`",
+        "objectRule": "draft creates version; open vote invokes replacement invariant",
+        "requiredEvidence": "`resolution_amended`; when open also `vote_superseded`/new `vote_opened`"
+      },
+      {
+        "name": "replace_open_vote",
+        "class": "H",
+        "section": "Votes, proxies and certificates",
+        "requiredAuthority": "secretary + `S:A`",
+        "objectRule": "open or source-update-pending vote and exact replacement package",
+        "requiredEvidence": "atomically disposes every old act, creates new open vote/electorate/package, `vote_opened`, per-newly-eligible notice/`notice_delivered`, informational `vote_replaced`, and actionable `revote_required` only for still-eligible prior principals"
+      },
+      {
+        "name": "exclude_pending_vote_source",
+        "class": "H",
+        "section": "Votes, proxies and certificates",
+        "requiredAuthority": "secretary + `S:A`",
+        "objectRule": "exact pending source with nonblank reason",
+        "requiredEvidence": "`vote_source_excluded`; original package remains byte-identical"
+      },
+      {
+        "name": "extend_vote_deadline",
+        "class": "H",
+        "section": "Votes, proxies and certificates",
+        "requiredAuthority": "secretary + `S:A`",
+        "objectRule": "draft version or open-vote replacement only",
+        "requiredEvidence": "no in-place open extension; replacement events/notices"
+      },
+      {
+        "name": "close_vote",
+        "class": "H",
+        "section": "Votes, proxies and certificates",
+        "requiredAuthority": "secretary + `S:A`; only for `secretariat_confirmed` close mode",
+        "objectRule": "exact open vote, healthy clock, one tally kernel",
+        "requiredEvidence": "`vote_closing`, signed certificate, then `vote_closed` atomically recoverable; automatic close is an internal typed worker operation, never this MCP tool"
+      },
+      {
+        "name": "cancel_vote",
+        "class": "H",
+        "section": "Votes, proxies and certificates",
+        "requiredAuthority": "secretary + `S:A`",
+        "objectRule": "open/draft, exact reason",
+        "requiredEvidence": "`vote_cancelled`; terminal, acts retained non-outcome-bearing"
+      },
+      {
+        "name": "get_minutes",
+        "class": "R",
+        "section": "Minutes and signatures",
+        "requiredAuthority": "`G:R`",
+        "objectRule": "meeting/minutes access",
+        "requiredEvidence": "exact version/hash/transcript annex refs"
+      },
+      {
+        "name": "list_minutes_versions",
+        "class": "R",
+        "section": "Minutes and signatures",
+        "requiredAuthority": "`G:R`",
+        "objectRule": "minutes access",
+        "requiredEvidence": "immutable visible versions"
+      },
+      {
+        "name": "get_minutes_lineage",
+        "class": "R",
+        "section": "Minutes and signatures",
+        "requiredAuthority": "`G:R`",
+        "objectRule": "access to original/correction aggregates",
+        "requiredEvidence": "immutable package/correction IDs, versions, hashes and terminal states"
+      },
+      {
+        "name": "create_minutes_version",
+        "class": "D",
+        "section": "Minutes and signatures",
+        "requiredAuthority": "secretary + `S:A`",
+        "objectRule": "unpublished draft only; accepted canonical text/transcript refs",
+        "requiredEvidence": "`minutes_version_created`; no publication; published/finalized input rejects"
+      },
+      {
+        "name": "publish_minutes",
+        "class": "H",
+        "section": "Minutes and signatures",
+        "requiredAuthority": "secretary + `S:A`",
+        "objectRule": "exact unpublished draft version and proposed signer set",
+        "requiredEvidence": "enters `published_review`; `minutes_published`, per-recipient review notices"
+      },
+      {
+        "name": "list_minutes_review_items",
+        "class": "R",
+        "section": "Minutes and signatures",
+        "requiredAuthority": "entitled participant + `G:R`",
+        "objectRule": "exact visible minutes package",
+        "requiredEvidence": "immutable comments/redlines/withdrawals/dispositions only"
+      },
+      {
+        "name": "comment_minutes",
+        "class": "D",
+        "section": "Minutes and signatures",
+        "requiredAuthority": "entitled voting member **or observer** + `M:A`",
+        "objectRule": "current `published_review` package; strict `boardagent.minutes-comment.v1`, exact base hash and anchor",
+        "requiredEvidence": "immutable comment; `minutes_commented`"
+      },
+      {
+        "name": "withdraw_minutes_comment",
+        "class": "D",
+        "section": "Minutes and signatures",
+        "requiredAuthority": "entitled comment author, including observer + `M:A`",
+        "objectRule": "own pending comment on current `published_review` package",
+        "requiredEvidence": "immutable `minutes_review_withdrawn`; text remains permanent"
+      },
+      {
+        "name": "propose_minutes_redline",
+        "class": "D",
+        "section": "Minutes and signatures",
+        "requiredAuthority": "entitled voting member **or observer** + `M:A`",
+        "objectRule": "current `published_review` package; strict `boardagent.minutes-redline.v1`; exact base/version/line anchor/old-text hash; no attachment",
+        "requiredEvidence": "`minutes_redline_proposed`; never applies content itself"
+      },
+      {
+        "name": "resolve_minutes_review_item",
+        "class": "H",
+        "section": "Minutes and signatures",
+        "requiredAuthority": "secretary + `S:A`",
+        "objectRule": "exact pending nonwithdrawn item and reason; redline acceptance supplies canonical replacement",
+        "requiredEvidence": "`minutes_review_dispositioned`; accepted redline creates version/diff and returns the new package to review"
+      },
+      {
+        "name": "correct_minutes_package",
+        "class": "H",
+        "section": "Minutes and signatures",
+        "requiredAuthority": "secretary + `S:A`",
+        "objectRule": "published/signature-ready but nonfinalized current package",
+        "requiredEvidence": "new immutable version; `minutes_package_corrected`; supersedes stale draft actions/stages/signatures, returns to review and emits current re-sign notices"
+      },
+      {
+        "name": "prepare_minutes_for_signature",
+        "class": "H",
+        "section": "Minutes and signatures",
+        "requiredAuthority": "secretary + `S:A`",
+        "objectRule": "all review items dispositioned; exact action-items-or-none declaration and signer set",
+        "requiredEvidence": "freezes package; `minutes_signature_package_issued`"
+      },
+      {
+        "name": "stage_minutes_signature",
+        "class": "H",
+        "section": "Minutes and signatures",
+        "requiredAuthority": "configured entitled voting member **or observer** + `M:A`",
+        "objectRule": "exact current minutes/package hash",
+        "requiredEvidence": "standard MRTR; `minutes_signed`; observer attestation is non-voting"
+      },
+      {
+        "name": "finalize_minutes",
+        "class": "H",
+        "section": "Minutes and signatures",
+        "requiredAuthority": "secretary + `S:A`",
+        "objectRule": "required current-package signatures complete",
+        "requiredEvidence": "`minutes_action_items_activated` plus `minutes_finalized`; activation manifest is bound; terminal"
+      },
+      {
+        "name": "create_minutes_correction_cycle",
+        "class": "H",
+        "section": "Minutes and signatures",
+        "requiredAuthority": "secretary + `S:A`",
+        "objectRule": "exact finalized minutes, correction reason and new canonical package",
+        "requiredEvidence": "original stays terminal; new linked aggregate enters `published_review`; `minutes_correction_cycle_created`"
+      },
+      {
+        "name": "cancel_minutes",
+        "class": "H",
+        "section": "Minutes and signatures",
+        "requiredAuthority": "secretary + `S:A`",
+        "objectRule": "nonfinalized package and reason",
+        "requiredEvidence": "`minutes_cancelled`; immutable terminal history"
+      },
+      {
+        "name": "list_my_tasks",
+        "class": "R",
+        "section": "Tasks, proposals and secretariat messages",
+        "requiredAuthority": "`G:R`",
+        "objectRule": "own assigned tasks",
+        "requiredEvidence": "own evidence/status only"
+      },
+      {
+        "name": "list_action_items",
+        "class": "R",
+        "section": "Tasks, proposals and secretariat messages",
+        "requiredAuthority": "`G:R`",
+        "objectRule": "board/minutes ACL; observers read entitled items",
+        "requiredEvidence": "status/owner/due/source/evidence refs without hidden counts"
+      },
+      {
+        "name": "get_task",
+        "class": "R",
+        "section": "Tasks, proposals and secretariat messages",
+        "requiredAuthority": "`G:R`",
+        "objectRule": "assignee, entitled board participant or secretary/creator",
+        "requiredEvidence": "exact task/evidence lineage subject to source ACL"
+      },
+      {
+        "name": "get_action_item",
+        "class": "R",
+        "section": "Tasks, proposals and secretariat messages",
+        "requiredAuthority": "`G:R`",
+        "objectRule": "exact entitled minutes-linked task",
+        "requiredEvidence": "source minutes/version/hash, owner, due, evidence/review/closure lineage"
+      },
+      {
+        "name": "log_minutes_action_items",
+        "class": "H",
+        "section": "Tasks, proposals and secretariat messages",
+        "requiredAuthority": "secretary + `S:A`",
+        "objectRule": "exact review-resolved minutes version; structured nonempty list",
+        "requiredEvidence": "immutable **draft** tasks/manifests; `minutes_action_items_declared`; no extraction/owner notice before finalization"
+      },
+      {
+        "name": "declare_no_minutes_action_items",
+        "class": "H",
+        "section": "Tasks, proposals and secretariat messages",
+        "requiredAuthority": "secretary + `S:A`",
+        "objectRule": "exact review-resolved minutes version",
+        "requiredEvidence": "explicit hashed declaration; `minutes_action_items_declared`"
+      },
+      {
+        "name": "create_task",
+        "class": "H",
+        "section": "Tasks, proposals and secretariat messages",
+        "requiredAuthority": "secretary + `S:A`",
+        "objectRule": "active board/member and canonical assignment",
+        "requiredEvidence": "`task_created`; assignee pending action"
+      },
+      {
+        "name": "start_task",
+        "class": "D",
+        "section": "Tasks, proposals and secretariat messages",
+        "requiredAuthority": "assignee + `T:A`",
+        "objectRule": "own open task",
+        "requiredEvidence": "`task_started`"
+      },
+      {
+        "name": "submit_task_evidence",
+        "class": "D",
+        "section": "Tasks, proposals and secretariat messages",
+        "requiredAuthority": "assignee + `T:A`",
+        "objectRule": "own nonterminal task; canonical evidence refs only",
+        "requiredEvidence": "immutable evidence; `task_evidence_submitted`"
+      },
+      {
+        "name": "review_task_evidence",
+        "class": "H",
+        "section": "Tasks, proposals and secretariat messages",
+        "requiredAuthority": "secretary + `S:A`",
+        "objectRule": "pending exact evidence; reason required",
+        "requiredEvidence": "`task_evidence_reviewed`; rejection preserves evidence and returns item to open"
+      },
+      {
+        "name": "complete_task",
+        "class": "H",
+        "section": "Tasks, proposals and secretariat messages",
+        "requiredAuthority": "secretary + `S:A`",
+        "objectRule": "exact minutes/task basis and at least one accepted evidence hash",
+        "requiredEvidence": "`task_completed`; closure hash binds all accepted evidence; terminal"
+      },
+      {
+        "name": "create_task_correction_cycle",
+        "class": "H",
+        "section": "Tasks, proposals and secretariat messages",
+        "requiredAuthority": "secretary + `S:A`",
+        "objectRule": "exact completed task, reason and new canonical task/evidence requirements",
+        "requiredEvidence": "completed original remains terminal; linked open cycle; `task_correction_cycle_created`"
+      },
+      {
+        "name": "cancel_task",
+        "class": "H",
+        "section": "Tasks, proposals and secretariat messages",
+        "requiredAuthority": "secretary + `S:A`",
+        "objectRule": "nonterminal and reason",
+        "requiredEvidence": "`task_cancelled`; terminal"
+      },
+      {
+        "name": "propose_action",
+        "class": "D",
+        "section": "Tasks, proposals and secretariat messages",
+        "requiredAuthority": "voting member/management + `MP`",
+        "objectRule": "active board and strict proposal schema",
+        "requiredEvidence": "`proposal_submitted`; never executes"
+      },
+      {
+        "name": "withdraw_proposal",
+        "class": "D",
+        "section": "Tasks, proposals and secretariat messages",
+        "requiredAuthority": "proposer + `MP`",
+        "objectRule": "own pending proposal",
+        "requiredEvidence": "`proposal_withdrawn`; payload retained"
+      },
+      {
+        "name": "list_proposals",
+        "class": "R",
+        "section": "Tasks, proposals and secretariat messages",
+        "requiredAuthority": "secretary + `S:A`",
+        "objectRule": "board queue",
+        "requiredEvidence": "entitled proposals only"
+      },
+      {
+        "name": "approve_proposal",
+        "class": "D",
+        "section": "Tasks, proposals and secretariat messages",
+        "requiredAuthority": "secretary + `S:A`",
+        "objectRule": "pending proposal",
+        "requiredEvidence": "`proposal_approved_to_draft`; creates draft only"
+      },
+      {
+        "name": "reject_proposal",
+        "class": "D",
+        "section": "Tasks, proposals and secretariat messages",
+        "requiredAuthority": "secretary + `S:A`",
+        "objectRule": "pending proposal and reason",
+        "requiredEvidence": "`proposal_rejected`"
+      },
+      {
+        "name": "ask_secretariat",
+        "class": "D",
+        "section": "Tasks, proposals and secretariat messages",
+        "requiredAuthority": "nonobserver member/management + `S:M`",
+        "objectRule": "active board",
+        "requiredEvidence": "immutable request; `secretariat_request_created`"
+      },
+      {
+        "name": "list_secretariat_requests",
+        "class": "R",
+        "section": "Tasks, proposals and secretariat messages",
+        "requiredAuthority": "requester or secretary + `G:R`",
+        "objectRule": "own request or board queue",
+        "requiredEvidence": "no cross-board visibility"
+      },
+      {
+        "name": "reply_secretariat_request",
+        "class": "D",
+        "section": "Tasks, proposals and secretariat messages",
+        "requiredAuthority": "secretary + `S:A`",
+        "objectRule": "board request",
+        "requiredEvidence": "immutable response; `secretariat_request_replied`"
+      },
+      {
+        "name": "close_secretariat_request",
+        "class": "D",
+        "section": "Tasks, proposals and secretariat messages",
+        "requiredAuthority": "requester or secretary + `S:M`",
+        "objectRule": "answered request only",
+        "requiredEvidence": "`secretariat_request_closed`; no deletion"
+      },
+      {
+        "name": "list_members",
+        "class": "R",
+        "section": "Members, enrollment, sessions and clients",
+        "requiredAuthority": "secretary/admin + `S:A`",
+        "objectRule": "organization/board administrative view",
+        "requiredEvidence": "minimal identities/roles; no credential material"
+      },
+      {
+        "name": "get_member",
+        "class": "R",
+        "section": "Members, enrollment, sessions and clients",
+        "requiredAuthority": "own identity or secretary/admin + `S:A`",
+        "objectRule": "exact authorized member",
+        "requiredEvidence": "accountable principal shown for AI observer"
+      },
+      {
+        "name": "manage_member",
+        "class": "H",
+        "section": "Members, enrollment, sessions and clients",
+        "requiredAuthority": "Current human admin + `S:A`, OR current human secretary with live exact-board member-administration delegation + `S:A` and strictly allowed operation/target.",
+        "objectRule": "Admin behavior preserved. Delegate: non-null granted board only, ordinary human voting director, no self/privileged/observer/management/AI target, no secretary/admin/other-delegate changes or onward delegation.",
+        "requiredEvidence": "Existing exact H and history/revocation, plus immutable board-readable appointment citations and bounded reason for delegated changes."
+      },
+      {
+        "name": "issue_enrollment",
+        "class": "H",
+        "section": "Members, enrollment, sessions and clients",
+        "requiredAuthority": "secretary/admin + `S:A`",
+        "objectRule": "precreated seat; no active invitation",
+        "requiredEvidence": "one-time reference/QR payload only once; `enrollment_issued`"
+      },
+      {
+        "name": "list_enrollments",
+        "class": "R",
+        "section": "Members, enrollment, sessions and clients",
+        "requiredAuthority": "secretary/admin + `S:A`",
+        "objectRule": "organization",
+        "requiredEvidence": "status/expiry only, no bearer material"
+      },
+      {
+        "name": "revoke_enrollment",
+        "class": "H",
+        "section": "Members, enrollment, sessions and clients",
+        "requiredAuthority": "secretary/admin + `S:A`",
+        "objectRule": "exact live invitation",
+        "requiredEvidence": "`enrollment_revoked`"
+      },
+      {
+        "name": "confirm_enrollment_activation",
+        "class": "H",
+        "section": "Members, enrollment, sessions and clients",
+        "requiredAuthority": "secretary/admin + `S:A`",
+        "objectRule": "pending seat, exact 10-minute human code and identity-proof method",
+        "requiredEvidence": "`member_activated`; never approves link possession alone"
+      },
+      {
+        "name": "initiate_identity_recovery",
+        "class": "H",
+        "section": "Members, enrollment, sessions and clients",
+        "requiredAuthority": "secretary/admin + `S:A`",
+        "objectRule": "verified person/seat and reason",
+        "requiredEvidence": "old sessions/credentials handled explicitly; `identity_recovery_started`"
+      },
+      {
+        "name": "list_my_sessions",
+        "class": "R",
+        "section": "Members, enrollment, sessions and clients",
+        "requiredAuthority": "authenticated",
+        "objectRule": "own sessions only",
+        "requiredEvidence": "client/time/status; token values absent"
+      },
+      {
+        "name": "revoke_my_session",
+        "class": "H",
+        "section": "Members, enrollment, sessions and clients",
+        "requiredAuthority": "authenticated recent auth",
+        "objectRule": "own named refresh family/session",
+        "requiredEvidence": "`session_revoked`"
+      },
+      {
+        "name": "list_oauth_clients",
+        "class": "R",
+        "section": "Members, enrollment, sessions and clients",
+        "requiredAuthority": "admin + `S:A`",
+        "objectRule": "deployment",
+        "requiredEvidence": "safe client metadata/status only"
+      },
+      {
+        "name": "block_oauth_client",
+        "class": "H",
+        "section": "Members, enrollment, sessions and clients",
+        "requiredAuthority": "admin + `S:A`",
+        "objectRule": "exact server-issued client ID",
+        "requiredEvidence": "grants/families revoked; `oauth_client_blocked`"
+      },
+      {
+        "name": "unblock_oauth_client",
+        "class": "H",
+        "section": "Members, enrollment, sessions and clients",
+        "requiredAuthority": "admin + `S:A`",
+        "objectRule": "exact blocked client",
+        "requiredEvidence": "`oauth_client_unblocked`; no implicit grants"
+      },
+      {
+        "name": "link_external_identity",
+        "class": "H",
+        "section": "Members, enrollment, sessions and clients",
+        "requiredAuthority": "admin + `S:A` and browser subject proof",
+        "objectRule": "existing invited member and exact issuer/subject",
+        "requiredEvidence": "`external_identity_linked`"
+      },
+      {
+        "name": "unlink_external_identity",
+        "class": "H",
+        "section": "Members, enrollment, sessions and clients",
+        "requiredAuthority": "admin + `S:A`",
+        "objectRule": "preserve at least one recovery path",
+        "requiredEvidence": "`external_identity_unlinked` and sessions revoked"
+      },
+      {
+        "name": "export_audit_chain",
+        "class": "H",
+        "section": "Audit, export, webhooks and permanent-record policy",
+        "requiredAuthority": "`A:R` + recent auth",
+        "objectRule": "authorized organization/board scope",
+        "requiredEvidence": "async frozen request; `export_requested`"
+      },
+      {
+        "name": "verify_audit_chain",
+        "class": "R",
+        "section": "Audit, export, webhooks and permanent-record policy",
+        "requiredAuthority": "`A:R`",
+        "objectRule": "authorized chain/chunk or supplied export",
+        "requiredEvidence": "recompute and report first break"
+      },
+      {
+        "name": "export_system_data",
+        "class": "H",
+        "section": "Audit, export, webhooks and permanent-record policy",
+        "requiredAuthority": "admin + `S:A` + recent auth",
+        "objectRule": "explicit frozen scope",
+        "requiredEvidence": "excludes all secret material; `export_requested`"
+      },
+      {
+        "name": "get_export_status",
+        "class": "R",
+        "section": "Audit, export, webhooks and permanent-record policy",
+        "requiredAuthority": "requesting principal + original scope",
+        "objectRule": "unguessable request ID",
+        "requiredEvidence": "state/manifest hash only"
+      },
+      {
+        "name": "read_export_chunk",
+        "class": "R",
+        "section": "Audit, export, webhooks and permanent-record policy",
+        "requiredAuthority": "requesting principal + original scope + recent auth",
+        "objectRule": "ready artifact and bounded chunk",
+        "requiredEvidence": "exact chunk hash plus `resource_fetch`"
+      },
+      {
+        "name": "cancel_export",
+        "class": "H",
+        "section": "Audit, export, webhooks and permanent-record policy",
+        "requiredAuthority": "requesting principal + original authority",
+        "objectRule": "queued/running request",
+        "requiredEvidence": "`export_cancelled`; partial artifacts quarantined"
+      },
+      {
+        "name": "delete_export_artifact",
+        "class": "H",
+        "section": "Audit, export, webhooks and permanent-record policy",
+        "requiredAuthority": "requesting principal + original authority",
+        "objectRule": "ready artifact",
+        "requiredEvidence": "artifact destroyed, permanent receipt/hash; `export_artifact_deleted`"
+      },
+      {
+        "name": "get_retention_policy",
+        "class": "R",
+        "section": "Audit, export, webhooks and permanent-record policy",
+        "requiredAuthority": "`A:R` or admin + `S:A`",
+        "objectRule": "deployment",
+        "requiredEvidence": "reports indefinite record retention and expiring ephemera classes"
+      },
+      {
+        "name": "list_my_webhooks",
+        "class": "R",
+        "section": "Audit, export, webhooks and permanent-record policy",
+        "requiredAuthority": "`N:M`",
+        "objectRule": "own member endpoints",
+        "requiredEvidence": "URL redacted; secret absent"
+      },
+      {
+        "name": "configure_webhook",
+        "class": "H",
+        "section": "Audit, export, webhooks and permanent-record policy",
+        "requiredAuthority": "`N:M` + recent auth",
+        "objectRule": "own HTTPS public endpoint; SSRF checks",
+        "requiredEvidence": "one-time secret display; `webhook_configured`"
+      },
+      {
+        "name": "rotate_webhook_secret",
+        "class": "H",
+        "section": "Audit, export, webhooks and permanent-record policy",
+        "requiredAuthority": "`N:M` + recent auth",
+        "objectRule": "own endpoint",
+        "requiredEvidence": "old secret invalidated; new secret never idempotently replayed"
+      },
+      {
+        "name": "disable_webhook",
+        "class": "H",
+        "section": "Audit, export, webhooks and permanent-record policy",
+        "requiredAuthority": "`N:M`",
+        "objectRule": "own endpoint",
+        "requiredEvidence": "`webhook_disabled`"
+      },
+      {
+        "name": "test_webhook",
+        "class": "D",
+        "section": "Audit, export, webhooks and permanent-record policy",
+        "requiredAuthority": "`N:M`",
+        "objectRule": "own verified endpoint",
+        "requiredEvidence": "contentless test wake-up; `webhook_tested`"
+      },
+      {
+        "name": "list_my_drafts",
+        "class": "R",
+        "section": "Wizard draft lifecycle",
+        "requiredAuthority": "secretary/management/member according to draft type",
+        "objectRule": "own nonexpired drafts",
+        "requiredEvidence": "safe summaries only"
+      },
+      {
+        "name": "resume_draft",
+        "class": "R",
+        "section": "Wizard draft lifecycle",
+        "requiredAuthority": "original creator plus current authority",
+        "objectRule": "signed draft/client binding; client portability policy",
+        "requiredEvidence": "exact current step/package; no mutation"
+      },
+      {
+        "name": "cancel_draft",
+        "class": "D",
+        "section": "Wizard draft lifecycle",
+        "requiredAuthority": "original creator",
+        "objectRule": "own active draft",
+        "requiredEvidence": "`draft_cancelled`; immutable answers retained"
+      },
+      {
+        "name": "manage_company_admin",
+        "class": "H",
+        "section": "Administrative succession and delegation",
+        "requiredAuthority": "Current human identity + `S:A`; admin for propose/transfer/revoke, named recipient for accept/decline, proposer/current admin for cancel; exact recent-auth H. Observer identities excluded.",
+        "objectRule": "Same organization, exact target/proposal/assignment and versions; pending proposals confer no authority; last active human admin preserved.",
+        "requiredEvidence": "Exact consent, immutable role/proposal evidence and event; elevation/revocation invalidates affected connections."
+      },
+      {
+        "name": "manage_member_admin_delegation",
+        "class": "H",
+        "section": "Administrative succession and delegation",
+        "requiredAuthority": "Current human admin + `S:A`; exact recent-auth H.",
+        "objectRule": "Exactly one active board and active human secretary; grant expiry at most 90 days; no onward delegation.",
+        "requiredEvidence": "Exact consent, reason, 1–8 board-readable immutable appointment citations, grant/revoke event and connection invalidation."
+      },
+      {
+        "name": "list_administrative_access",
+        "class": "R",
+        "section": "Administrative succession and delegation",
+        "requiredAuthority": "Current human identity + `S:A`; own mode only, or current admin for organization mode.",
+        "objectRule": "Own rights/pending offers only by default; exact organization/optional board filter and signed actor/generation-bound pagination; no private cross-board inventory.",
+        "requiredEvidence": "Bounded current authority and pending proposal references; at most 100 entries; no tokens or credential material."
+      },
+      {
+        "name": "publish_secretary_support",
+        "class": "H",
+        "section": "Identity and onboarding",
+        "requiredAuthority": "current board secretary + `S:A`; company admin + `S:A` only for its first support version",
+        "objectRule": "One active same-organization board; latest expected support version; no org-level default; current human eligibility and no board recusal. First version may be initialized by company admin without a seat; later updates require current board secretary authority.",
+        "requiredEvidence": "Exact canonical contact version, protected confirmation, secretary_support_published and immutable preceding versions."
+      },
+      {
+        "name": "publish_onboarding_terms",
+        "class": "H",
+        "section": "Identity and onboarding",
+        "requiredAuthority": "company admin + `S:A`",
+        "objectRule": "Own organization and one supported seat role; latest expected terms version; current human administrative eligibility; grants no board reads.",
+        "requiredEvidence": "Exact canonical terms version, protected confirmation, onboarding_terms_published; fresh own attestation required, no automatic acceptance."
+      },
+      {
+        "name": "reissue_activation",
+        "class": "H",
+        "section": "Identity and onboarding",
+        "requiredAuthority": "company admin + `S:A`; current board secretary + `S:A` for a pending seat on their own board. The first setup administrator's own pending activation is served only by the operator CLI mode `bootstrap reissue-first-activation`.",
+        "objectRule": "Exactly one same-organization member in `pending_activation` with an active registered passkey whose latest activation challenge is expired or exhausted and never consumed; not the caller; no live (issued, unexpired, unexhausted) challenge; the consumed invitation stays consumed. Issues a one-use ten-minute restart handoff; the fresh ten-minute code is minted only after a user-verified assertion with the already-registered passkey.",
+        "requiredEvidence": "Protected confirmation naming the member, the stale challenge and the proofing method; `activation_restart_issued` linking the revoked challenge and the handoff; `activation_restart_completed` linking the handoff and the fresh challenge; the later `confirm_enrollment_activation` binds that fresh challenge. Append-only history."
+      }
+    ],
+    "resourceTemplates": [
+      {
+        "uriTemplate": "board://{boardId}",
+        "representations": "canonical JSON metadata",
+        "entitlementRoot": "board membership"
+      },
+      {
+        "uriTemplate": "board://{boardId}/governance-profile/{version}",
+        "representations": "canonical JSON + cited clauses",
+        "entitlementRoot": "board membership"
+      },
+      {
+        "uriTemplate": "board://{boardId}/rulesets/{version}",
+        "representations": "canonical JSON",
+        "entitlementRoot": "board membership"
+      },
+      {
+        "uriTemplate": "board://{boardId}/documents/{documentId}/versions/{version}",
+        "representations": "exact UTF-8 MD/TXT or canonical typed JSON",
+        "entitlementRoot": "document ACL minus exclusion"
+      },
+      {
+        "uriTemplate": "board://{boardId}/submissions/{submissionId}/versions/{version}",
+        "representations": "canonical JSON/resource refs",
+        "entitlementRoot": "management thread policy"
+      },
+      {
+        "uriTemplate": "board://{boardId}/questions/{questionId}",
+        "representations": "canonical immutable-turn JSON",
+        "entitlementRoot": "question ACL minus exclusion"
+      },
+      {
+        "uriTemplate": "board://{boardId}/meetings/{meetingId}/agendas/{version}",
+        "representations": "canonical JSON/resource refs",
+        "entitlementRoot": "meeting/document policy"
+      },
+      {
+        "uriTemplate": "board://{boardId}/meetings/{meetingId}/transcripts/{version}",
+        "representations": "canonical MD or typed turn JSON",
+        "entitlementRoot": "meeting/transcript policy"
+      },
+      {
+        "uriTemplate": "board://{boardId}/minutes/{minutesId}/versions/{version}",
+        "representations": "exact canonical text/package JSON",
+        "entitlementRoot": "minutes policy"
+      },
+      {
+        "uriTemplate": "board://{boardId}/minutes/{minutesId}/review/{itemId}",
+        "representations": "strict comment/redline/disposition JSON",
+        "entitlementRoot": "minutes participant policy"
+      },
+      {
+        "uriTemplate": "board://{boardId}/action-items/{taskId}",
+        "representations": "canonical task/source/evidence/closure JSON",
+        "entitlementRoot": "source minutes/task ACL"
+      },
+      {
+        "uriTemplate": "board://{boardId}/votes/{voteId}",
+        "representations": "canonical vote metadata",
+        "entitlementRoot": "vote policy"
+      },
+      {
+        "uriTemplate": "board://{boardId}/votes/{voteId}/packages/{version}",
+        "representations": "exact decision-package JSON + hashes",
+        "entitlementRoot": "vote/document/Q&A intersection"
+      },
+      {
+        "uriTemplate": "board://{boardId}/votes/{voteId}/certificates/{certificateId}",
+        "representations": "signed bundle",
+        "entitlementRoot": "authenticated certificate policy"
+      },
+      {
+        "uriTemplate": "board://{boardId}/tasks/{taskId}",
+        "representations": "canonical task/evidence refs",
+        "entitlementRoot": "assignee/secretariat policy"
+      },
+      {
+        "uriTemplate": "export://{exportId}/chunks/{chunkNo}",
+        "representations": "encrypted/bounded exact bytes",
+        "entitlementRoot": "original requester/scope/recent auth"
+      }
+    ],
+    "prompts": [
+      {
+        "name": "onboard-boardagent",
+        "intendedFlow": "Explain agent-only responsibilities, ask desired presentation/local-memory form, surface secretary support, then prepare exact attestation."
+      },
+      {
+        "name": "set-vote",
+        "intendedFlow": "Start/resume the cited-rule vote wizard ending in `create_vote`."
+      },
+      {
+        "name": "call-meeting",
+        "intendedFlow": "Start/resume the meeting wizard ending in `create_meeting`."
+      },
+      {
+        "name": "circulate-document",
+        "intendedFlow": "Validate/select canonical material and recipients ending in `circulate_document`."
+      },
+      {
+        "name": "record-minutes",
+        "intendedFlow": "Build minutes and optional machine-readable transcript annex, require structured action-items-or-none, run machine-readable review/redline disposition, then issue the signature package."
+      },
+      {
+        "name": "configure-ruleset",
+        "intendedFlow": "Build/validate cited typed rules ending in `manage_ruleset`."
+      },
+      {
+        "name": "ask-management",
+        "intendedFlow": "Collect a scoped question, citations, responsible management owner and due time ending in `ask_management`."
+      }
+    ],
+    "httpAuthorityFamilies": [
+      {
+        "surface": "`POST /mcp`",
+        "authorityAndBehavior": "exact sessionless MCP `2026-07-28`; bounded `2025-11-25` read/resource/prompt profile on the same canonical resource"
+      },
+      {
+        "surface": "`/.well-known/oauth-protected-resource/mcp`",
+        "authorityAndBehavior": "public path-aware RFC 9728 metadata whose `resource` is exactly normalized `https://host/mcp`; every 401 challenge points here"
+      },
+      {
+        "surface": "authorization-server metadata and JWKS",
+        "authorityAndBehavior": "public protocol metadata/current+retired verification keys"
+      },
+      {
+        "surface": "CIMD client-ID resolution and `/oauth/register`",
+        "authorityAndBehavior": "outbound CIMD resolution is SSRF-hardened; DCR fallback is open, rate-limited and audited; protocol client ID and internal UUID remain distinct"
+      },
+      {
+        "surface": "`/oauth/authorize`, `/oauth/token`, `/oauth/revoke`",
+        "authorityAndBehavior": "code+S256 PKCE, exact resource, rotated refresh; no query bearer token"
+      },
+      {
+        "surface": "`/auth/passkey/*`, `/auth/totp/*`, `/auth/oidc/*`",
+        "authorityAndBehavior": "minimal hardened interactions, exact RP/origin/state/nonce/session binding"
+      },
+      {
+        "surface": "`/enroll/{opaque}`",
+        "authorityAndBehavior": "one-use invite redemption to pending activation; link alone grants nothing"
+      },
+      {
+        "surface": "`/onboarding/{opaque}`",
+        "authorityAndBehavior": "exact current terms and secure attestation after identity activation"
+      },
+      {
+        "surface": "`POST /verify/certificate`",
+        "authorityAndBehavior": "rate-limited unguessable bundle/ID, persisted-data recomputation, generic verdict"
+      },
+      {
+        "surface": "`/health/live`, `/health/ready`",
+        "authorityAndBehavior": "no secret/config/data disclosure; readiness includes schema/key/storage invariants"
+      },
+      {
+        "surface": "`/metrics`",
+        "authorityAndBehavior": "disabled or separately operator-authenticated; no protected identifiers"
+      }
+    ],
+    "cli": [
+      {
+        "commands": ["bootstrap"],
+        "authorityPath": "sole preidentity exception; local operator, one-use singleton transaction, creates organization/first admin-secretary/invite and audit event"
+      },
+      {
+        "commands": ["migrate", "migration-check"],
+        "authorityPath": "separate DB migrator role; checksum/advisory-lock/forward-only production policy"
+      },
+      {
+        "commands": ["export"],
+        "authorityPath": "online authenticated principal invoking the same export service and `H` policy; never direct DB dump"
+      },
+      {
+        "commands": ["verify-chain"],
+        "authorityPath": "offline read-only verifier over exported bytes"
+      },
+      {
+        "commands": ["verify-certificate"],
+        "authorityPath": "offline read-only stateless verifier over bundle/public keys"
+      },
+      {
+        "commands": ["backup"],
+        "authorityPath": "separate operator role, consistent DB/WAL manifest and encrypted destination; no governance mutation"
+      },
+      {
+        "commands": ["restore-check"],
+        "authorityPath": "isolated read-only full integrity validation; never repairs evidence"
+      },
+      {
+        "commands": ["worker"],
+        "authorityPath": "service principal limited to typed jobs; cannot mint tokens or bypass board/object IDs"
+      },
+      {
+        "commands": ["audit-recovery"],
+        "authorityPath": "Local migrator/operator only; inspect and prepare are read-only, apply binds the exact instance, request digest and observed audit state. Existing implemented recovery preserves original history and permanent missed-deadline findings; no governance or human-consent authority."
+      },
+      {
+        "commands": ["key-lifecycle"],
+        "authorityPath": "Local migrator/operator only; prepare validates exact key identities, dependencies and protected staged files, apply commits the exact maintenance transition and immutable audit receipt, inspect resolves interruption/retry. No agent or company-administrator authority. Registry reservation only until the supported command, five-purpose transitions, restart and restore tests are implemented and qualified."
+      }
+    ],
+    "events": [
+      { "name": "context_read", "category": "Protocol, identity and policy" },
+      { "name": "client_registered", "category": "Protocol, identity and policy" },
+      { "name": "client_registration_rejected", "category": "Protocol, identity and policy" },
+      { "name": "oauth_client_blocked", "category": "Protocol, identity and policy" },
+      { "name": "oauth_client_unblocked", "category": "Protocol, identity and policy" },
+      { "name": "token_issued", "category": "Protocol, identity and policy" },
+      { "name": "token_refreshed", "category": "Protocol, identity and policy" },
+      { "name": "token_reuse_detected", "category": "Protocol, identity and policy" },
+      { "name": "session_revoked", "category": "Protocol, identity and policy" },
+      { "name": "enrollment_issued", "category": "Protocol, identity and policy" },
+      { "name": "enrollment_redeemed", "category": "Protocol, identity and policy" },
+      { "name": "enrollment_revoked", "category": "Protocol, identity and policy" },
+      { "name": "member_activated", "category": "Protocol, identity and policy" },
+      { "name": "identity_recovery_started", "category": "Protocol, identity and policy" },
+      { "name": "external_identity_linked", "category": "Protocol, identity and policy" },
+      { "name": "external_identity_unlinked", "category": "Protocol, identity and policy" },
+      { "name": "member_changed", "category": "Protocol, identity and policy" },
+      { "name": "onboarding_stage_created", "category": "Protocol, identity and policy" },
+      { "name": "onboarding_attested", "category": "Protocol, identity and policy" },
+      { "name": "onboarding_stale", "category": "Protocol, identity and policy" },
+      { "name": "authorization_denied", "category": "Protocol, identity and policy" },
+      { "name": "rate_limited", "category": "Protocol, identity and policy" },
+      { "name": "resource_fetch", "category": "Record delivery, documents and communications" },
+      { "name": "notice_delivered", "category": "Record delivery, documents and communications" },
+      {
+        "name": "document_version_created",
+        "category": "Record delivery, documents and communications"
+      },
+      {
+        "name": "document_circulated",
+        "category": "Record delivery, documents and communications"
+      },
+      {
+        "name": "document_access_changed",
+        "category": "Record delivery, documents and communications"
+      },
+      { "name": "document_archived", "category": "Record delivery, documents and communications" },
+      {
+        "name": "document_soft_deleted",
+        "category": "Record delivery, documents and communications"
+      },
+      { "name": "recusal_changed", "category": "Record delivery, documents and communications" },
+      {
+        "name": "management_submission_created",
+        "category": "Record delivery, documents and communications"
+      },
+      {
+        "name": "management_revision_requested",
+        "category": "Record delivery, documents and communications"
+      },
+      {
+        "name": "management_revision_replied",
+        "category": "Record delivery, documents and communications"
+      },
+      {
+        "name": "management_submission_version_created",
+        "category": "Record delivery, documents and communications"
+      },
+      {
+        "name": "management_submission_approved_to_draft",
+        "category": "Record delivery, documents and communications"
+      },
+      {
+        "name": "management_submission_rejected",
+        "category": "Record delivery, documents and communications"
+      },
+      {
+        "name": "management_question_asked",
+        "category": "Record delivery, documents and communications"
+      },
+      {
+        "name": "management_question_answered",
+        "category": "Record delivery, documents and communications"
+      },
+      {
+        "name": "management_question_followed_up",
+        "category": "Record delivery, documents and communications"
+      },
+      {
+        "name": "secretariat_request_created",
+        "category": "Record delivery, documents and communications"
+      },
+      {
+        "name": "secretariat_request_replied",
+        "category": "Record delivery, documents and communications"
+      },
+      {
+        "name": "secretariat_request_closed",
+        "category": "Record delivery, documents and communications"
+      },
+      { "name": "board_created", "category": "Governance, consent and evidence" },
+      { "name": "board_amended", "category": "Governance, consent and evidence" },
+      { "name": "board_archived", "category": "Governance, consent and evidence" },
+      { "name": "governance_profile_activated", "category": "Governance, consent and evidence" },
+      { "name": "matter_evaluated", "category": "Governance, consent and evidence" },
+      { "name": "ruleset_amended", "category": "Governance, consent and evidence" },
+      { "name": "rule_overridden", "category": "Governance, consent and evidence" },
+      { "name": "stage_created", "category": "Governance, consent and evidence" },
+      { "name": "stage_replaced", "category": "Governance, consent and evidence" },
+      { "name": "elicitation_sent", "category": "Governance, consent and evidence" },
+      { "name": "consent_recorded", "category": "Governance, consent and evidence" },
+      { "name": "consent_rejected", "category": "Governance, consent and evidence" },
+      { "name": "ballot_cast", "category": "Governance, consent and evidence" },
+      { "name": "ballot_superseded", "category": "Governance, consent and evidence" },
+      { "name": "proxy_granted", "category": "Governance, consent and evidence" },
+      { "name": "proxy_revoked", "category": "Governance, consent and evidence" },
+      { "name": "resolution_amended", "category": "Governance, consent and evidence" },
+      { "name": "vote_opened", "category": "Governance, consent and evidence" },
+      { "name": "vote_source_update_pending", "category": "Governance, consent and evidence" },
+      { "name": "vote_source_excluded", "category": "Governance, consent and evidence" },
+      { "name": "vote_closing", "category": "Governance, consent and evidence" },
+      { "name": "vote_closed", "category": "Governance, consent and evidence" },
+      { "name": "vote_cancelled", "category": "Governance, consent and evidence" },
+      { "name": "vote_superseded", "category": "Governance, consent and evidence" },
+      { "name": "vote_replaced", "category": "Governance, consent and evidence" },
+      { "name": "revote_required", "category": "Governance, consent and evidence" },
+      { "name": "certificate_issued", "category": "Governance, consent and evidence" },
+      { "name": "certificate_corrected", "category": "Governance, consent and evidence" },
+      { "name": "meeting_called", "category": "Governance, consent and evidence" },
+      { "name": "meeting_amended", "category": "Governance, consent and evidence" },
+      { "name": "meeting_rsvp_recorded", "category": "Governance, consent and evidence" },
+      { "name": "meeting_attendance_recorded", "category": "Governance, consent and evidence" },
+      { "name": "meeting_attendance_corrected", "category": "Governance, consent and evidence" },
+      { "name": "meeting_completed", "category": "Governance, consent and evidence" },
+      { "name": "meeting_cancelled", "category": "Governance, consent and evidence" },
+      { "name": "transcript_version_created", "category": "Governance, consent and evidence" },
+      { "name": "transcript_secretary_verified", "category": "Governance, consent and evidence" },
+      { "name": "transcript_qna_linked", "category": "Governance, consent and evidence" },
+      { "name": "transcript_turn_challenged", "category": "Governance, consent and evidence" },
+      { "name": "transcript_challenge_resolved", "category": "Governance, consent and evidence" },
+      { "name": "minutes_version_created", "category": "Governance, consent and evidence" },
+      { "name": "minutes_published", "category": "Governance, consent and evidence" },
+      { "name": "minutes_commented", "category": "Governance, consent and evidence" },
+      { "name": "minutes_review_withdrawn", "category": "Governance, consent and evidence" },
+      { "name": "minutes_redline_proposed", "category": "Governance, consent and evidence" },
+      { "name": "minutes_review_dispositioned", "category": "Governance, consent and evidence" },
+      { "name": "minutes_package_corrected", "category": "Governance, consent and evidence" },
+      {
+        "name": "minutes_correction_cycle_created",
+        "category": "Governance, consent and evidence"
+      },
+      { "name": "minutes_action_items_declared", "category": "Governance, consent and evidence" },
+      {
+        "name": "minutes_action_item_draft_superseded",
+        "category": "Governance, consent and evidence"
+      },
+      { "name": "minutes_action_items_activated", "category": "Governance, consent and evidence" },
+      {
+        "name": "minutes_signature_package_issued",
+        "category": "Governance, consent and evidence"
+      },
+      { "name": "minutes_signed", "category": "Governance, consent and evidence" },
+      { "name": "minutes_signature_superseded", "category": "Governance, consent and evidence" },
+      { "name": "minutes_resign_required", "category": "Governance, consent and evidence" },
+      { "name": "minutes_finalized", "category": "Governance, consent and evidence" },
+      { "name": "minutes_cancelled", "category": "Governance, consent and evidence" },
+      { "name": "task_created", "category": "Workflow, export and operations" },
+      { "name": "task_started", "category": "Workflow, export and operations" },
+      { "name": "task_evidence_submitted", "category": "Workflow, export and operations" },
+      { "name": "task_evidence_reviewed", "category": "Workflow, export and operations" },
+      { "name": "task_completed", "category": "Workflow, export and operations" },
+      { "name": "task_correction_cycle_created", "category": "Workflow, export and operations" },
+      { "name": "task_cancelled", "category": "Workflow, export and operations" },
+      { "name": "proposal_submitted", "category": "Workflow, export and operations" },
+      { "name": "proposal_withdrawn", "category": "Workflow, export and operations" },
+      { "name": "proposal_approved_to_draft", "category": "Workflow, export and operations" },
+      { "name": "proposal_rejected", "category": "Workflow, export and operations" },
+      { "name": "draft_cancelled", "category": "Workflow, export and operations" },
+      { "name": "draft_expired", "category": "Workflow, export and operations" },
+      { "name": "export_requested", "category": "Workflow, export and operations" },
+      { "name": "export_started", "category": "Workflow, export and operations" },
+      { "name": "export_performed", "category": "Workflow, export and operations" },
+      { "name": "export_failed", "category": "Workflow, export and operations" },
+      { "name": "export_cancelled", "category": "Workflow, export and operations" },
+      { "name": "export_artifact_deleted", "category": "Workflow, export and operations" },
+      { "name": "webhook_configured", "category": "Workflow, export and operations" },
+      { "name": "webhook_secret_rotated", "category": "Workflow, export and operations" },
+      { "name": "webhook_disabled", "category": "Workflow, export and operations" },
+      { "name": "webhook_tested", "category": "Workflow, export and operations" },
+      { "name": "webhook_delivery_attempted", "category": "Workflow, export and operations" },
+      { "name": "audit_checkpoint_signed", "category": "Workflow, export and operations" },
+      { "name": "audit_verification_failed", "category": "Workflow, export and operations" },
+      { "name": "migration_applied", "category": "Workflow, export and operations" },
+      { "name": "backup_completed", "category": "Workflow, export and operations" },
+      { "name": "restore_verified", "category": "Workflow, export and operations" },
+      { "name": "company_admin_proposed", "category": "Administrative succession and delegation" },
+      {
+        "name": "company_admin_proposal_cancelled",
+        "category": "Administrative succession and delegation"
+      },
+      {
+        "name": "company_admin_proposal_declined",
+        "category": "Administrative succession and delegation"
+      },
+      { "name": "company_admin_granted", "category": "Administrative succession and delegation" },
+      { "name": "company_admin_revoked", "category": "Administrative succession and delegation" },
+      {
+        "name": "company_admin_transferred",
+        "category": "Administrative succession and delegation"
+      },
+      {
+        "name": "member_admin_delegation_granted",
+        "category": "Administrative succession and delegation"
+      },
+      {
+        "name": "member_admin_delegation_revoked",
+        "category": "Administrative succession and delegation"
+      },
+      { "name": "key_lifecycle_changed", "category": "Operator key maintenance" },
+      { "name": "secretary_support_published", "category": "Identity and onboarding" },
+      { "name": "onboarding_terms_published", "category": "Identity and onboarding" },
+      { "name": "activation_restart_issued", "category": "Identity and onboarding" },
+      { "name": "activation_restart_completed", "category": "Identity and onboarding" }
+    ],
+    "securityRequirements": [
+      {
+        "id": "SR-001",
+        "requirement": "Server runtime makes zero model/embedding/OCR/conversion/content-analysis calls and has no provider SDK, key, endpoint or egress path."
+      },
+      {
+        "id": "SR-002",
+        "requirement": "Every inbound MCP/HTTP/job/CLI trust-boundary payload is strict-versioned Zod; unknown fields reject and are safely audited."
+      },
+      {
+        "id": "SR-003",
+        "requirement": "Canonical JSON uses versioned RFC 8785/JCS; text uses strict UTF-8 NFC/LF; hashes bind exact canonical bytes/schema."
+      },
+      {
+        "id": "SR-004",
+        "requirement": "Only canonical MD, TXT and declared strict JSON document versions are accepted; PDF, Office, image, scan, archive, polyglot and malformed bytes are rejected before durable content storage."
+      },
+      {
+        "id": "SR-005",
+        "requirement": "Unsupported material failure is loud, identifies the rejected class and instructs management/secretariat to resubmit machine-readable source."
+      },
+      {
+        "id": "SR-006",
+        "requirement": "Free text remains inert data, is never interpreted as instructions/rules/code, is escaped on browser surfaces and excluded from operational logs/wake-up notifications."
+      },
+      {
+        "id": "SR-007",
+        "requirement": "Future `SubmissionCheckProvider` is schema-only and unreachable in v1: no implementation, tool, config, job, secret, dependency or network permission."
+      },
+      {
+        "id": "SR-008",
+        "requirement": "Path-aware `/.well-known/oauth-protected-resource/mcp` identifies exactly normalized `https://host/mcp`; every 401 points there, authorization/token requests carry that exact RFC 8707 resource and JWT `aud` equals it."
+      },
+      {
+        "id": "SR-009",
+        "requirement": "OAuth authorization code uses S256 PKCE, exact registered redirect, 60-second one-use code; implicit/password/device/client-credentials/plain PKCE are absent."
+      },
+      {
+        "id": "SR-010",
+        "requirement": "Access token lifetime is at most 15 minutes; persisted JTI revocation is checked on protected use."
+      },
+      {
+        "id": "SR-011",
+        "requirement": "Opaque refresh tokens rotate on every use, enforce 30-day idle/90-day absolute limits, and family reuse atomically compromises/revokes the family."
+      },
+      {
+        "id": "SR-012",
+        "requirement": "Client name, brand, software ID and self-asserted metadata never grant data/action authority; internal client UUID and exact protocol client-ID kind/value remain distinct throughout policy/audit."
+      },
+      {
+        "id": "SR-013",
+        "requirement": "CIMD/DCR redirect and metadata resolution resists SSRF/DNS rebinding, has size/count/rate limits and audits registration. Allowlisting accepts only a typed verified CIMD URL, DCR opaque ID or preregistered ID—never asserted metadata."
+      },
+      {
+        "id": "SR-014",
+        "requirement": "An arbitrary conforming client without an invited, activated person and current board authority obtains no protected existence, count, content or action."
+      },
+      {
+        "id": "SR-015",
+        "requirement": "Builtin enrollment requires precreated seat, 24-hour one-use hashed invite, UV passkey, pending activation and secretary-confirmed 10-minute human code before grants."
+      },
+      {
+        "id": "SR-016",
+        "requirement": "Passkeys enforce exact RP ID/origin/challenge, `userVerification: required`, one-use challenge and sign-counter/backup-state policy; no silent UV downgrade."
+      },
+      {
+        "id": "SR-017",
+        "requirement": "TOTP is an explicit fallback only, with encrypted secret, replay-step protection, bounded attempts and lockout; passwords are absent."
+      },
+      {
+        "id": "SR-018",
+        "requirement": "OIDC/UAE Pass maps only an invited prelinked exact `(issuer, subject)` or confirmed pending link; no email matching or auto-provisioning."
+      },
+      {
+        "id": "SR-019",
+        "requirement": "External IdP tokens remain server-side; BoardAgent alone mints resource-bound MCP tokens."
+      },
+      {
+        "id": "SR-020",
+        "requirement": "Daily use silently rotates refresh credentials; secretary is not involved again except recovery, identity or authority change."
+      },
+      {
+        "id": "SR-021",
+        "requirement": "Recovery revokes or explicitly preserves each credential/session according to the confirmed package and records the identity-proof method."
+      },
+      {
+        "id": "SR-022",
+        "requirement": "Auth/browser pages rotate sessions, bind state/nonce/CSRF, escape all external text, set secure cookies/CSP/frame protections and reject Host/origin/proxy confusion."
+      },
+      {
+        "id": "SR-023",
+        "requirement": "Scopes are ceilings; active identity, current onboarding, organization capability, board seat, object state, ACL and live exclusion are rechecked per request."
+      },
+      {
+        "id": "SR-024",
+        "requirement": "Observer identities hold no governance/admin/management/secretary/task authority. Every identity retains exact own-object onboarding attestation, session revocation and contentless-webhook self-service. Observer governance/workflow writes are exactly the six registered question/follow-up/minutes comment/withdraw/redline/signature operations. Observer minutes signature is record attestation, never a vote."
+      },
+      {
+        "id": "SR-025",
+        "requirement": "Every document/list/search/snippet/count/cursor/feed/notification uses the same deny-wins visibility policy; recused users learn no excluded existence."
+      },
+      {
+        "id": "SR-026",
+        "requirement": "PostgreSQL `FORCE ROW LEVEL SECURITY`, distinct migrator/server/worker roles, composite FKs and transaction-local principal context defend visibility-sensitive data."
+      },
+      {
+        "id": "SR-027",
+        "requirement": "Connection-pool reuse cannot carry principal/board/RLS context across transactions."
+      },
+      {
+        "id": "SR-028",
+        "requirement": "Worker, bootstrap, public verifier, operator CLI and anonymous actors have explicit least-authority policy; forged typed jobs cannot target another object/board."
+      },
+      {
+        "id": "SR-029",
+        "requirement": "AI observer uses separate seat credentials and recorded accountable principal; audit actor remains the AI seat and never impersonates the principal."
+      },
+      {
+        "id": "SR-030",
+        "requirement": "Rate limits apply by trusted token/member/client/IP class without leaking protected identifiers or differing hidden-object responses."
+      },
+      {
+        "id": "SR-031",
+        "requirement": "Role-specific onboarding states no governance portal exists and directs the agent to ask how the person wants information presented."
+      },
+      {
+        "id": "SR-032",
+        "requirement": "Secretary publishes current support contact details before participants can attest onboarding."
+      },
+      {
+        "id": "SR-033",
+        "requirement": "Exact versioned terms require secure attestation of review duty, presentation/local-memory responsibility, agent/local-copy security, refetch-before-act and tombstone handling."
+      },
+      {
+        "id": "SR-034",
+        "requirement": "Ordinary scopes are denied until current terms are attested; material terms change forces reattestation."
+      },
+      {
+        "id": "SR-035",
+        "requirement": "BoardAgent records canonical terms delivery and attestation, never claims comprehension, consumption or safe client rendering."
+      },
+      {
+        "id": "SR-036",
+        "requirement": "Snapshot/delta responses contain currently entitled metadata/resource references only; content fetch remains separately authorized and audited."
+      },
+      {
+        "id": "SR-037",
+        "requirement": "Signed cursors bind member, board, entitlement generation and position; revocation/recusal emits tombstones and stale cursors cannot resurrect access."
+      },
+      {
+        "id": "SR-038",
+        "requirement": "`list_pending_actions` returns all entitled deltas in one bounded call and keeps `revote_required` pending until resolved/terminal."
+      },
+      {
+        "id": "SR-039",
+        "requirement": "Admin-activated governance profile is immutable/versioned and cites machine-readable charter clauses for weights, thresholds, quorum, ties, abstentions, proxies, notice and close modes."
+      },
+      {
+        "id": "SR-040",
+        "requirement": "Secretary can select only profile-permitted vote rules; an allowed override requires exact reason/citation/fresh confirmation and `rule_overridden`."
+      },
+      {
+        "id": "SR-041",
+        "requirement": "`evaluate_matter` is pure/deterministic over strict typed facts; missing/no-match/ambiguous equal result fails closed and every result is reproducibly persisted."
+      },
+      {
+        "id": "SR-042",
+        "requirement": "One BigInt/rational kernel drives casting display, quorum, tally and certificate; observers/nonvoters/recusals are excluded from eligible weight."
+      },
+      {
+        "id": "SR-043",
+        "requirement": "Opening freezes baseline electorate/weights, resolution, decision package, profile/rule/ruleset and explicit close mode."
+      },
+      {
+        "id": "SR-044",
+        "requirement": "Post-open recusal is a live versioned exclusion that atomically invalidates that principal's stage, ballot and proxy authority and recomputes eligible weight."
+      },
+      {
+        "id": "SR-045",
+        "requirement": "Proxy is per-vote, no chain/cycle, eligible same-board holder, attributed to principal/stamped caster; frozen precedence/revocation rule is applied once."
+      },
+      {
+        "id": "SR-046",
+        "requirement": "Modern MCP is sessionless `POST /mcp`; every request has matching protocol/method/name headers and protocol-version/capability metadata, every result has `resultType`, and a missing form-elicitation capability returns `-32021` before any binding stage. Header/body mismatch returns `-32020`; unsupported version returns `-32022`."
+      },
+      {
+        "id": "SR-047",
+        "requirement": "Every H act persists a one-use 10-minute stage and exact canonical embedded MRTR form/protected state before `input_required`; retry must use a new request ID, exact original method/arguments, byte-identical state, exact input responses, `action=accept`, `approve=true` and exact code. Cross-context or legacy invocation rejects before act; the legacy list omits H tools."
+      },
+      {
+        "id": "SR-048",
+        "requirement": "Wrong confirmation code atomically rejects/consumes stage and audits; timeout/cancel/replay/stale package/authz creates no act."
+      },
+      {
+        "id": "SR-049",
+        "requirement": "Successful confirm transaction rechecks token/policy/version/expiry/code, records consent then act, feed and audit atomically."
+      },
+      {
+        "id": "SR-050",
+        "requirement": "An open decision package is immutable. Any included resolution/submission/document/Q&A/rule/deadline change supersedes old vote and opens a new linked vote with zero carried ballot/stage/proxy."
+      },
+      {
+        "id": "SR-051",
+        "requirement": "Superseded acts remain permanent/non-counting. Replacement atomically creates new package/electorate/open event; notice/feed/`notice_delivered` for every newly eligible member; informational `vote_replaced` for every entitled recipient; and persistent actionable `revote_required` only for still-eligible prior ballot principals, with old/new IDs/hashes, changed classes, deadline and safe refs. It resolves only by accepted direct/proxy ballot, terminal/replacement vote or eligibility loss."
+      },
+      {
+        "id": "SR-052",
+        "requirement": "Live recusal is the only narrow eligibility-state exception to replacement; no content/rule/deadline edit is mislabeled recusal."
+      },
+      {
+        "id": "SR-053",
+        "requirement": "Automatic close is explicit per vote and suppressed on unhealthy clock; a vote cannot become `closed` without persisted, recomputed and signed certificate evidence."
+      },
+      {
+        "id": "SR-054",
+        "requirement": "All management-secretariat submissions, revisions, replies, disposition and materials occur through MCP immutable records; product has no SMTP/email workflow."
+      },
+      {
+        "id": "SR-055",
+        "requirement": "Submission approval creates a separately confirmable draft only and never executes the proposed governance act."
+      },
+      {
+        "id": "SR-056",
+        "requirement": "Voting members and observers can ask entitled board-bound questions with assigned management owner and due time; turns/citations/delivery are immutable and permanent."
+      },
+      {
+        "id": "SR-057",
+        "requirement": "Assigned management must add a nonblank recorded answer; an unanswered question cannot become answered/closed by status mutation and becomes overdue predictably."
+      },
+      {
+        "id": "SR-058",
+        "requirement": "Follow-up appends a permanent turn and reopens management pending action."
+      },
+      {
+        "id": "SR-059",
+        "requirement": "Vote decision package binds exact management submission, documents, explicitly secretary-linked Q&A thread inclusive turn cutoffs/hashes, resolution, electorate and governance versions; consent/certificate bind the package hash. Unlinked questions never block."
+      },
+      {
+        "id": "SR-060",
+        "requirement": "Every explicitly included Q&A thread must contain a recorded management answer through its frozen cutoff before close; a later turn on that linked thread atomically enters source-update pending."
+      },
+      {
+        "id": "SR-061",
+        "requirement": "Management amendment or post-cutoff turn on a linked Q&A thread blocks linked open-vote close until confirmed byte-preserving exclusion or full replacement. Server never infers materiality."
+      },
+      {
+        "id": "SR-062",
+        "requirement": "Meetings/agendas/schedules/minutes are immutable versions after notice. Minutes distinguish unpublished draft, published review, signature-ready and terminal states; nonfinal correction returns a new version to review, while finalized correction creates a separately identified linked aggregate and leaves the original terminal."
+      },
+      {
+        "id": "SR-063",
+        "requirement": "BoardAgent accepts no recording and transcribes nothing; secretary may contribute only a canonical transcript annex with loud provenance/coverage/verification state."
+      },
+      {
+        "id": "SR-064",
+        "requirement": "Transcript turns are immutable; correction is a new version; minutes bind annex hash/version and transcript change invalidates stale signature stages/signatures."
+      },
+      {
+        "id": "SR-065",
+        "requirement": "Transcript-derived unanswered Q&A creates management actions and links exact turns to permanent management threads."
+      },
+      {
+        "id": "SR-066",
+        "requirement": "Every registered governance/security/delivery event appends strict canonical details to one immutable SHA-256 sequence/previous-hash chain in transaction order."
+      },
+      {
+        "id": "SR-067",
+        "requirement": "DB roles/triggers prevent request-path update/delete of audit, consent, ballot, version, certificate and snapshot rows."
+      },
+      {
+        "id": "SR-068",
+        "requirement": "Separate Ed25519 evidence key signs checkpoint at ≤1,000 events or ≤15 minutes and on export; key history and compromise time remain verifiable."
+      },
+      {
+        "id": "SR-069",
+        "requirement": "Audit verifier recomputes canonical events/order/links/checkpoints and reports the first break, truncation or manifest inconsistency without repair."
+      },
+      {
+        "id": "SR-070",
+        "requirement": "Mandatory audit append failure blocks governance writes and protected resource serving; checkpoint outage obeys explicit lag readiness policy and never fabricates signature."
+      },
+      {
+        "id": "SR-071",
+        "requirement": "`resource_fetch` prepared event binds exact URI/representation/hash/length/member/JTI/client/origin before bytes; completion/interruption is separately recorded when observable."
+      },
+      {
+        "id": "SR-072",
+        "requirement": "`notice_delivered` means committed recipient feed/channel handoff only, never human receipt/reading."
+      },
+      {
+        "id": "SR-073",
+        "requirement": "Certificate payload is recomputable entirely from persisted vote/package/rule/electorate/consent/ballot/proxy/outcome rows using the one kernel."
+      },
+      {
+        "id": "SR-074",
+        "requirement": "Public verification uses unguessable POST input, reloads persisted truth, recomputes, rate-limits and returns generic verdict without enumeration/disclosure bypass."
+      },
+      {
+        "id": "SR-075",
+        "requirement": "Every mutation has scoped canonical idempotency; one-time secrets are never stored/replayed as ordinary idempotent response."
+      },
+      {
+        "id": "SR-076",
+        "requirement": "System/audit exports require fresh confirmation/recent auth, frozen scope, repeatable-read complete manifest, encryption and 24-hour artifact deletion receipt; secrets are excluded."
+      },
+      {
+        "id": "SR-077",
+        "requirement": "Governance records, content, Q&A, audit, evidence, terms and history have indefinite retention; v1 has no physical purge path. Soft deletion is visibility-only plus permanent snapshot/tombstone."
+      },
+      {
+        "id": "SR-078",
+        "requirement": "Only ephemeral secrets/codes/tokens/temp exports/rate buckets/allowlisted operational logs and rotating backup generations expire under explicit policy."
+      },
+      {
+        "id": "SR-079",
+        "requirement": "Webhook is optional/off, contentless, per-member HMAC, HTTPS public target, fresh DNS/no redirects/private addresses and bounded retries."
+      },
+      {
+        "id": "SR-080",
+        "requirement": "Jobs use typed payloads, transactional outbox, leases/heartbeat, idempotency, bounded retry/dead letter and no external call inside governance transaction."
+      },
+      {
+        "id": "SR-081",
+        "requirement": "Migrations verify immutable ledger/checksum/order under fixed advisory lock; unknown/downgrade/edited history refuses readiness; production never auto-downs."
+      },
+      {
+        "id": "SR-082",
+        "requirement": "Backup boundary includes consistent DB/WAL, full content hashes, migration ledger, audit head/checkpoint and key registry; clean restore verifies all records before readiness."
+      },
+      {
+        "id": "SR-083",
+        "requirement": "Production configuration refuses placeholder/default/unknown `BOARDAGENT_` values, insecure public URL, weak key topology or unavailable authoritative storage."
+      },
+      {
+        "id": "SR-084",
+        "requirement": "Operational logs/metrics/traces exclude canonical/free text, protected raw IDs, statements, secrets and small-group governance signals."
+      },
+      {
+        "id": "SR-085",
+        "requirement": "Single image runs nonroot/read-only-root/minimal capabilities; server and worker have distinct DB/egress roles; vendor reference is excluded from build/image/publish."
+      },
+      {
+        "id": "SR-086",
+        "requirement": "Minutes comments use only strict `boardagent.minutes-comment.v1`; redlines use only strict `boardagent.minutes-redline.v1` with base ID/version/hash, exact section/line anchor and anchored-text hash, operation, canonical proposed text, rationale and citations."
+      },
+      {
+        "id": "SR-087",
+        "requirement": "BoardAgent accepts no DOCX tracked changes, attachment, binary patch, fuzzy anchor or unknown redline/comment field; stale/cross-minutes bases and changed anchor text reject without mutation."
+      },
+      {
+        "id": "SR-088",
+        "requirement": "Entitled voting members and observers may submit comments/redlines only against the exact current `published_review` package; signature-ready/finalized input rejects. Content is inert, bounded, ACL/recusal-filtered, idempotent, permanent and excluded from logs/webhooks."
+      },
+      {
+        "id": "SR-089",
+        "requirement": "Only a pending current-package comment's author may append immutable withdrawal. Every nonwithdrawn item must receive secretary accept/reject plus reason; accepted redline creates a new immutable version/diff, all content remains permanent, and any pending item blocks signature readiness."
+      },
+      {
+        "id": "SR-090",
+        "requirement": "Before signature-ready state, secretary must freshly confirm a structured complete action-item manifest or exact `no_action_items` declaration for the current minutes version. BoardAgent never extracts action items. Logged items remain non-actionable drafts with no owner notice until that exact package finalizes."
+      },
+      {
+        "id": "SR-091",
+        "requirement": "A minutes package change atomically dispositions its draft action items as superseded. Finalization binds an activation-manifest hash and activates/notifies only that exact signed manifest. Each item binds source minutes hash/locator, owner, due, evidence and visibility; rejection preserves evidence and assignee cannot self-close."
+      },
+      {
+        "id": "SR-092",
+        "requirement": "Action-item closure freshly confirms the exact task and accepted evidence hashes. Closure stays terminal/permanent; correction creates a separately identified linked open task/evidence cycle and never reopens or mutates the original."
+      },
+      {
+        "id": "SR-093",
+        "requirement": "Minutes signature binds signer/seat, exact package hash, transcript/action/review manifests, optional reservation, consent/token/client/origin/time. `signature_record_hash` identifies bytes; consent plus Ed25519-checkpointed chain provides attribution. V1 issues no standalone minutes certificate."
+      },
+      {
+        "id": "SR-094",
+        "requirement": "A package change supersedes stages/signatures, resolves older re-sign rows as package-superseded and emits exactly one current `minutes_resign_required` per affected signer. It resolves only by fresh current signature, later package supersession or package terminality; no signature/re-sign action carries silently."
+      },
+      {
+        "id": "SR-095",
+        "requirement": "Administrator appointments require current scoped human admin proposal and exact named-recipient acceptance; cancel, decline, revoke and atomic transfer retain their permanent lineage."
+      },
+      {
+        "id": "SR-096",
+        "requirement": "All administrator/member-removal paths share a serializable last-active-human-admin invariant; transfer preserves other roles, seats and historical governance evidence."
+      },
+      {
+        "id": "SR-097",
+        "requirement": "Board-member administration delegation is exact-board, expiring, non-transitive and limited to ordinary human voting directors; self, observer/AI, privileged and organization-wide targets are denied."
+      },
+      {
+        "id": "SR-098",
+        "requirement": "New administrative authority invalidates pre-elevation connections; revoked/expired/ended authority cannot survive cached tokens, refresh families, browser sessions or pending confirmation stages."
+      },
+      {
+        "id": "SR-099",
+        "requirement": "Administrative discovery and pagination expose only own grants/offers or explicitly admin-authorized organization results; protected target denial cannot disclose another board's roles."
+      },
+      {
+        "id": "SR-100",
+        "requirement": "Administrative finalizers enforce live authority, immutable evidence, fresh exact consent and atomic audit under runtime DB roles; migrations/exports/restores preserve these invariants."
+      },
+      {
+        "id": "SR-101",
+        "requirement": "Deterministic registry composition retains original frozen bytes and accepts only the exact implementation-authorized additive amendment and expected resulting counts."
+      },
+      {
+        "id": "SR-102",
+        "requirement": "Supported first-account activation and existing authorized-human recovery preserve actual human proof, one-time secrets and separation of operator, company admin, secretary and voter authority."
+      }
+    ],
+    "threats": [
+      {
+        "id": "TH-01",
+        "scenario": "Prompt-injected/malicious client with valid read token attempts an act",
+        "expectedControl": "read scope never stages/acts; safe denial",
+        "plannedProof": "`tests/attacks/compromised-client.spec.ts`"
+      },
+      {
+        "id": "TH-02",
+        "scenario": "Stolen read bearer",
+        "expectedControl": "resource-bound limited reads only; no mutation",
+        "plannedProof": "`tests/attacks/stolen-token.spec.ts`"
+      },
+      {
+        "id": "TH-03",
+        "scenario": "Stolen action bearer on capable client",
+        "expectedControl": "cannot bypass MRTR; residual attributable completion is documented",
+        "plannedProof": "`tests/attacks/stolen-token.spec.ts`"
+      },
+      {
+        "id": "TH-04",
+        "scenario": "Cross-board target substitution/confused deputy",
+        "expectedControl": "composite policy/FKs deny without existence signal",
+        "plannedProof": "`tests/attacks/cross-board-deputy.spec.ts`"
+      },
+      {
+        "id": "TH-05",
+        "scenario": "Scope inflation/observer attempts every mutation",
+        "expectedControl": "exact own-security self-service plus six governance exceptions pass; every other row denies",
+        "plannedProof": "generated `tests/authz/full-surface-matrix.spec.ts`"
+      },
+      {
+        "id": "TH-06",
+        "scenario": "CIMD/DCR SSRF, flood, squatting or self-asserted software ID used as allowlist key",
+        "expectedControl": "SSRF/rates/caps/audit; only typed protocol ID grants client admission",
+        "plannedProof": "`tests/attacks/client-registration-abuse.spec.ts`"
+      },
+      {
+        "id": "TH-07",
+        "scenario": "Redirect/PKCE/code replay/OAuth mix-up",
+        "expectedControl": "exact redirect/S256/one-use/issuer-resource binding",
+        "plannedProof": "`tests/attacks/oauth-flow-confusion.spec.ts`"
+      },
+      {
+        "id": "TH-08",
+        "scenario": "Token for another audience/resource/base URL",
+        "expectedControl": "reject and challenge exact resource",
+        "plannedProof": "`tests/attacks/token-audience-confusion.spec.ts`"
+      },
+      {
+        "id": "TH-09",
+        "scenario": "Recused member probes read/list/search/snippet/count/cursor/feed",
+        "expectedControl": "indistinguishable empty/not-found; no leak",
+        "plannedProof": "`tests/attacks/recusal-invisibility.spec.ts`"
+      },
+      {
+        "id": "TH-10",
+        "scenario": "MRTR retry changes request ID incorrectly, method/name/arguments/form responses/state/client/member/vote",
+        "expectedControl": "exact staged wire contract rejects; consumed stage cannot replay",
+        "plannedProof": "`tests/attacks/consent-context-replay.spec.ts`"
+      },
+      {
+        "id": "TH-11",
+        "scenario": "Wrong/expired code or stale package",
+        "expectedControl": "atomic reject/audit, zero act",
+        "plannedProof": "`tests/attacks/consent-rejections.spec.ts`"
+      },
+      {
+        "id": "TH-12",
+        "scenario": "Client auto-echoes confirmation",
+        "expectedControl": "event remains client-attributable; no comprehension claim",
+        "plannedProof": "`tests/attacks/auto-approval-residual.spec.ts`"
+      },
+      {
+        "id": "TH-13",
+        "scenario": "Audit row edit/delete/reorder/truncate",
+        "expectedControl": "verifier reports first break/manifest gap",
+        "plannedProof": "`tests/attacks/audit-tamper.spec.ts`"
+      },
+      {
+        "id": "TH-14",
+        "scenario": "Audit append/checkpoint signer outage",
+        "expectedControl": "fetch/write fail closed or bounded explicit checkpoint lag",
+        "plannedProof": "`tests/attacks/audit-outage.spec.ts`"
+      },
+      {
+        "id": "TH-15",
+        "scenario": "Forged/stale/enumerated public certificate",
+        "expectedControl": "persisted recomputation/generic rate-limited verdict",
+        "plannedProof": "`tests/attacks/public-certificate-abuse.spec.ts`"
+      },
+      {
+        "id": "TH-16",
+        "scenario": "Passkey wrong RP/origin/challenge/UV/replay",
+        "expectedControl": "ceremony refuses and rate-limits",
+        "plannedProof": "`tests/browser/webauthn-negative.spec.ts`"
+      },
+      {
+        "id": "TH-17",
+        "scenario": "Intercepted invite/QR or wrong person redeems",
+        "expectedControl": "pending zero-access; human code + secretary proof required",
+        "plannedProof": "`tests/attacks/enrollment-interception.spec.ts`"
+      },
+      {
+        "id": "TH-18",
+        "scenario": "Refresh-token reuse race",
+        "expectedControl": "one successor; whole family atomically compromised",
+        "plannedProof": "`tests/attacks/refresh-rotation-race.spec.ts`"
+      },
+      {
+        "id": "TH-19",
+        "scenario": "Unknown OIDC/UAE Pass subject/email collision",
+        "expectedControl": "no auto-provision; pending link/deny",
+        "plannedProof": "`tests/attacks/oidc-linking.spec.ts`"
+      },
+      {
+        "id": "TH-20",
+        "scenario": "CSRF/session fixation/clickjack/XSS/Host spoof on auth pages",
+        "expectedControl": "bound session/state/headers/escaping/origin",
+        "plannedProof": "`tests/browser/auth-page-hardening.spec.ts`"
+      },
+      {
+        "id": "TH-21",
+        "scenario": "Prompt instructions/HTML/Unicode/formulas in accepted text",
+        "expectedControl": "inert bytes, safe MCP framing/escaping, no log/notification copy",
+        "plannedProof": "`tests/attacks/untrusted-content.spec.ts`"
+      },
+      {
+        "id": "TH-22",
+        "scenario": "Spoofed Office/PDF/image/archive/polyglot/bomb",
+        "expectedControl": "reject before durable content and loudly remediate",
+        "plannedProof": "`tests/attacks/document-format-boundary.spec.ts`"
+      },
+      {
+        "id": "TH-23",
+        "scenario": "Operator sets future checker endpoint/key/provider",
+        "expectedControl": "unknown/forbidden config refuses v1",
+        "plannedProof": "`tests/attacks/future-provider-activation.spec.ts`"
+      },
+      {
+        "id": "TH-24",
+        "scenario": "Cross-board/recused Q&A query and count probing",
+        "expectedControl": "shared visibility predicate; no trace",
+        "plannedProof": "`tests/attacks/question-confidentiality.spec.ts`"
+      },
+      {
+        "id": "TH-25",
+        "scenario": "Management/status job silently closes unanswered question",
+        "expectedControl": "DB/state transition refuses; remains pending/overdue",
+        "plannedProof": "`tests/attacks/question-answer-integrity.spec.ts`"
+      },
+      {
+        "id": "TH-26",
+        "scenario": "Amend submission concurrent with cast/close",
+        "expectedControl": "vote lock enters pending/superseded; no close on stale package",
+        "plannedProof": "`tests/races/submission-vote-race.spec.ts`"
+      },
+      {
+        "id": "TH-27",
+        "scenario": "Prior voter misses replacement or ineligible member receives impossible action",
+        "expectedControl": "atomic open/notices/delivery/replaced/revote events; actionable only when eligible, with exact resolution lifecycle",
+        "plannedProof": "`tests/races/replacement-notice-atomicity.spec.ts`"
+      },
+      {
+        "id": "TH-28",
+        "scenario": "Cast/proxy concurrent with live recusal",
+        "expectedControl": "vote root serializes; excluded act cannot survive",
+        "plannedProof": "`tests/races/recusal-cast-race.spec.ts`"
+      },
+      {
+        "id": "TH-29",
+        "scenario": "Proxy cycle/chain/double cast/principal precedence race",
+        "expectedControl": "strict graph/policy/unique active principal ballot",
+        "plannedProof": "`tests/races/proxy-ballot-race.spec.ts`"
+      },
+      {
+        "id": "TH-30",
+        "scenario": "Weight/quorum/abstain/tie overflow/order manipulation",
+        "expectedControl": "exact one BigInt kernel/property invariants",
+        "plannedProof": "`tests/property/tally-quorum-proxy.property.ts`"
+      },
+      {
+        "id": "TH-31",
+        "scenario": "Poisoned/stale/ambiguous ruleset recommends weaker rule",
+        "expectedControl": "version/citation/fail-closed/confirmed override",
+        "plannedProof": "`tests/attacks/ruleset-steering.spec.ts`"
+      },
+      {
+        "id": "TH-32",
+        "scenario": "Wizard retry crosses draft/member/client",
+        "expectedControl": "signed bound state and row version reject",
+        "plannedProof": "`tests/attacks/cross-draft-confusion.spec.ts`"
+      },
+      {
+        "id": "TH-33",
+        "scenario": "Idempotency key replays invitation/webhook/export secret",
+        "expectedControl": "safe reference only; secret not replayed",
+        "plannedProof": "`tests/attacks/idempotency-secret-replay.spec.ts`"
+      },
+      {
+        "id": "TH-34",
+        "scenario": "Webhook localhost/metadata/DNS rebound/redirect",
+        "expectedControl": "resolve every attempt; block private classes/no redirects",
+        "plannedProof": "`tests/attacks/webhook-ssrf.spec.ts`"
+      },
+      {
+        "id": "TH-35",
+        "scenario": "Over-scoped member exfiltrates system export",
+        "expectedControl": "admin+recent auth+confirmation+frozen scope",
+        "plannedProof": "`tests/attacks/export-exfiltration.spec.ts`"
+      },
+      {
+        "id": "TH-36",
+        "scenario": "Forged job payload/lease theft/cross-board target",
+        "expectedControl": "typed schema, service policy, binding/idempotent lease",
+        "plannedProof": "`tests/attacks/job-forgery.spec.ts`"
+      },
+      {
+        "id": "TH-37",
+        "scenario": "Cursor tamper or entitlement revoked mid-page",
+        "expectedControl": "signature/generation/re-auth and tombstone",
+        "plannedProof": "`tests/attacks/cursor-entitlement.spec.ts`"
+      },
+      {
+        "id": "TH-38",
+        "scenario": "Migration checksum edit/reorder/downgrade/dual boot",
+        "expectedControl": "advisory lock and immutable ledger refuse",
+        "plannedProof": "`tests/attacks/migration-integrity.spec.ts`"
+      },
+      {
+        "id": "TH-39",
+        "scenario": "Restore with missing/changed blob/row/key/checkpoint",
+        "expectedControl": "full verification refuses readiness; never repairs",
+        "plannedProof": "`tests/operations/restore-corruption.spec.ts`"
+      },
+      {
+        "id": "TH-40",
+        "scenario": "Evidence key expires/compromised/KMS fails",
+        "expectedControl": "history/public keys retained; signing state blocks close/checkpoint policy",
+        "plannedProof": "`tests/attacks/key-lifecycle.spec.ts`"
+      },
+      {
+        "id": "TH-41",
+        "scenario": "Logs/metrics distinguish recused from nonexistent or contain text/IDs",
+        "expectedControl": "allowlist/pseudonym/differential outputs",
+        "plannedProof": "`tests/attacks/telemetry-leak.spec.ts`"
+      },
+      {
+        "id": "TH-42",
+        "scenario": "Unverified transcript presented as authoritative/audio-derived",
+        "expectedControl": "loud status/provenance; no recording claim",
+        "plannedProof": "`tests/attacks/transcript-claim.spec.ts`"
+      },
+      {
+        "id": "TH-43",
+        "scenario": "Transcript/minutes correction preserves old signatures",
+        "expectedControl": "version change atomically invalidates stages/signatures",
+        "plannedProof": "`tests/races/transcript-minutes-signature.spec.ts`"
+      },
+      {
+        "id": "TH-44",
+        "scenario": "One-call briefing omits delta or leaks other principal",
+        "expectedControl": "indexed member sequence and entitlement filter",
+        "plannedProof": "`tests/acceptance/daily-briefing.spec.ts`"
+      },
+      {
+        "id": "TH-45",
+        "scenario": "Client/handler omits/mismatches modern headers/capability/result contract or silently negotiates legacy act",
+        "expectedControl": "exact `-32020/-32021/-32022`; legacy H omitted/refused pre-stage; SDK shim off",
+        "plannedProof": "`tests/protocol/protocol-downgrade.spec.ts`"
+      },
+      {
+        "id": "TH-46",
+        "scenario": "Same member changes client brand",
+        "expectedControl": "identity/history/entitlements unchanged",
+        "plannedProof": "`tests/acceptance/client-portability.spec.ts`"
+      },
+      {
+        "id": "TH-47",
+        "scenario": "User skips/stales onboarding terms",
+        "expectedControl": "ordinary scope issuance/use denied",
+        "plannedProof": "`tests/attacks/onboarding-bypass.spec.ts`"
+      },
+      {
+        "id": "TH-48",
+        "scenario": "AI observer uses principal credential or mutates outside exact self-service/six governance exceptions",
+        "expectedControl": "separate actor credential/full-matrix denial/accountable metadata",
+        "plannedProof": "`tests/acceptance/ai-observer.spec.ts`"
+      },
+      {
+        "id": "TH-49",
+        "scenario": "Feed delivery is described as human reading",
+        "expectedControl": "typed wording/events prohibit consumption claim",
+        "plannedProof": "`tests/contracts/delivery-semantics.spec.ts`"
+      },
+      {
+        "id": "TH-50",
+        "scenario": "Clock drift causes legally mistimed automatic close",
+        "expectedControl": "health threshold suppresses close and alerts",
+        "plannedProof": "`tests/operations/clock-drift.spec.ts`"
+      },
+      {
+        "id": "TH-51",
+        "scenario": "Stream interrupts after prepared fetch event",
+        "expectedControl": "completion/interruption event is honest; no receipt claim",
+        "plannedProof": "`tests/faults/resource-stream-interruption.spec.ts`"
+      },
+      {
+        "id": "TH-52",
+        "scenario": "Secretary attempts in-place open vote edit/extension",
+        "expectedControl": "server creates replacement or refuses; no old hash mutation",
+        "plannedProof": "`tests/attacks/open-vote-mutation.spec.ts`"
+      },
+      {
+        "id": "TH-53",
+        "scenario": "Admin/job/operator attempts physical governance purge",
+        "expectedControl": "no product path/privilege; permanence invariant holds",
+        "plannedProof": "`tests/attacks/permanent-record-purge.spec.ts`"
+      },
+      {
+        "id": "TH-54",
+        "scenario": "Pooled DB context leaks across users",
+        "expectedControl": "transaction-local context reset; FORCE RLS denies",
+        "plannedProof": "`tests/races/rls-context-bleed.spec.ts`"
+      },
+      {
+        "id": "TH-55",
+        "scenario": "Concurrent rate-limit increments bypass cap",
+        "expectedControl": "atomic bucket/update and trusted keys",
+        "plannedProof": "`tests/races/rate-limit-concurrency.spec.ts`"
+      },
+      {
+        "id": "TH-56",
+        "scenario": "Client submits DOCX tracked changes/base64 attachment/unknown redline field",
+        "expectedControl": "strict schema and document boundary reject before review row",
+        "plannedProof": "`tests/attacks/minutes-redline-format.spec.ts`"
+      },
+      {
+        "id": "TH-57",
+        "scenario": "Client fuzzy-applies a stale/cross-minutes/changed-anchor patch",
+        "expectedControl": "exact base and anchored-text hash reject with zero version change",
+        "plannedProof": "`tests/attacks/minutes-redline-context.spec.ts`"
+      },
+      {
+        "id": "TH-58",
+        "scenario": "Observer uses minutes-review scope to vote/admin/task/alter minutes",
+        "expectedControl": "generated exact-tool exception; all other mutations deny",
+        "plannedProof": "`tests/authz/observer-exception-matrix.spec.ts`"
+      },
+      {
+        "id": "TH-59",
+        "scenario": "Review input/other-author withdrawal occurs after signature freeze, or secretary issues package with pending item/omitted action declaration",
+        "expectedControl": "current published-review and author/state/DB constraints refuse",
+        "plannedProof": "`tests/attacks/minutes-review-bypass.spec.ts`"
+      },
+      {
+        "id": "TH-60",
+        "scenario": "Assignee self-closes action, closure lacks accepted evidence, or correction reopens/mutates completed task",
+        "expectedControl": "role/state/confirmation refuses; linked correction cycle leaves original terminal",
+        "plannedProof": "`tests/attacks/action-item-false-closure.spec.ts`"
+      },
+      {
+        "id": "TH-61",
+        "scenario": "Minutes version/finalized correction races signature; second correction strands/carries re-sign state",
+        "expectedControl": "minutes root serializes; linked finalized correction, signature supersession and exact re-sign lifecycle commit atomically",
+        "plannedProof": "`tests/races/minutes-signature-version-race.spec.ts`"
+      },
+      {
+        "id": "TH-62",
+        "scenario": "Draft action is notified/acted before finalization, survives package replacement, or stale manifest activates",
+        "expectedControl": "draft rejects evidence; replacement dispositions stale drafts; exact activation manifest alone opens/notifies",
+        "plannedProof": "`tests/races/minutes-action-activation.spec.ts`"
+      },
+      {
+        "id": "TH-63",
+        "scenario": "Unlinked arbitrary question blocks close, or linked Q&A turn races cast/close without update-pending",
+        "expectedControl": "only explicit link/cutoff controls; linked turn locks vote and serializes pending state",
+        "plannedProof": "`tests/races/question-turn-vote-race.spec.ts`"
+      },
+      {
+        "id": "TH-64",
+        "scenario": "Forged or stale administrator offer acceptance",
+        "expectedControl": "SR-095; only named eligible human with fresh exact stage and live issuer can accept",
+        "plannedProof": "`tests/integration/company-admin-lifecycle.postgres.test.ts`"
+      },
+      {
+        "id": "TH-65",
+        "scenario": "Concurrent loss of all active administrators",
+        "expectedControl": "SR-096; common organization lock and serializable last-admin invariant across old and new paths",
+        "plannedProof": "`tests/integration/administrative-authority-races.postgres.test.ts`"
+      },
+      {
+        "id": "TH-66",
+        "scenario": "Cross-board or transitive secretary privilege escalation",
+        "expectedControl": "SR-097; operation/board/protected-target allowlist checked at prepare and commit",
+        "plannedProof": "`tests/integration/member-admin-delegation.postgres.test.ts`"
+      },
+      {
+        "id": "TH-67",
+        "scenario": "Cached token inherits elevation or retains revoked grant",
+        "expectedControl": "SR-098; live grant resolution plus affected connection invalidation and fresh reconnect",
+        "plannedProof": "`tests/integration/administrative-authority-races.postgres.test.ts`"
+      },
+      {
+        "id": "TH-68",
+        "scenario": "Administrative list/cursor reveals another board or person",
+        "expectedControl": "SR-099; own/admin read branch and signed scope-bound cursor",
+        "plannedProof": "`tests/integration/member-admin-delegation.postgres.test.ts`"
+      },
+      {
+        "id": "TH-69",
+        "scenario": "Runtime SQL bypass or partially committed role/audit transition",
+        "expectedControl": "SR-100; FORCE RLS, narrow finalizers, mandatory exact consent/audit and transactional rollback",
+        "plannedProof": "`tests/integration/administrative-authority-upgrade.postgres.test.ts`"
+      },
+      {
+        "id": "TH-70",
+        "scenario": "Hand-edited registry, unapproved delta or erased original authority",
+        "expectedControl": "SR-101; pinned base/amendment hashes, closed delta and unchanged original-row assertions",
+        "plannedProof": "`tests/phase0/administrative-amendment.test.ts`"
+      },
+      {
+        "id": "TH-71",
+        "scenario": "Bootstrap/recovery invents human identity or revives departed authority",
+        "expectedControl": "SR-102; supported operator ceremony, actual proof and strict generation/recovery policy",
+        "plannedProof": "`tests/protocol/administrative-authority-journey.spec.ts`"
+      }
+    ],
+    "acceptanceScenarios": [
+      {
+        "id": "AC-01",
+        "outcome": "Fresh Compose/VPS bootstrap → first secretary enrollment/passkey/activation → client registration → cited-rule `/set-vote` → second client briefing → MRTR ballot → close → offline certificate verification."
+      },
+      {
+        "id": "AC-02",
+        "outcome": "Recused member sees no excluded document trace through read, list, search, snippet, count, cursor, feed, notice or differential telemetry."
+      },
+      {
+        "id": "AC-03",
+        "outcome": "Proxy grant, attributed cast/stamped caster, direct-principal precedence and certificate lineage are exact."
+      },
+      {
+        "id": "AC-04",
+        "outcome": "Wrong code, expired stage, stale package, cross-client retry and post-replacement retry reject/audit with zero ballot."
+      },
+      {
+        "id": "AC-05",
+        "outcome": "One `list_pending_actions` call returns every entitled delta after cursor and nothing else."
+      },
+      {
+        "id": "AC-06",
+        "outcome": "Ruleset recommendation cites exact clause/version; departure requires reason and emits `rule_overridden`."
+      },
+      {
+        "id": "AC-07",
+        "outcome": "AI observer attests its own onboarding, revokes its own session and manages its own contentless webhook; reads entitled records, asks/follows up management questions, submits exact minutes comments/redlines and signs a configured minutes package; every other governance/workflow mutation is denied and every fetch/action identifies the AI seat plus accountable-principal metadata."
+      },
+      {
+        "id": "AC-08",
+        "outcome": "Same member connects through two differently branded conforming clients; identity/history/entitlements are unchanged; legacy client remains read-only."
+      },
+      {
+        "id": "AC-09",
+        "outcome": "Manual audit row mutation makes verifier report the exact first break; no repair occurs."
+      },
+      {
+        "id": "AC-10",
+        "outcome": "Prelinked OIDC/UAE Pass identity succeeds; unknown subject cannot auto-provision."
+      },
+      {
+        "id": "AC-11",
+        "outcome": "Role-specific agent onboarding asks presentation/local-memory preference, supplies secretary contact, and gates ordinary scopes until exact responsibility/agent-security terms are attested."
+      },
+      {
+        "id": "AC-12",
+        "outcome": "MD/TXT/typed JSON succeeds byte-exactly; PPTX/PDF/DOCX/image/scan/archive/spoof fails loudly with zero durable content/evidence attachment."
+      },
+      {
+        "id": "AC-13",
+        "outcome": "Management submits canonical materials, secretary requests revision, management resubmits, and approval creates only a separately confirmable draft—all inside MCP, with no email module."
+      },
+      {
+        "id": "AC-14",
+        "outcome": "Member and observer questions reach assigned management, become overdue, require recorded answers, preserve follow-up/citations and can be included by exact cutoff in a decision package."
+      },
+      {
+        "id": "AC-15",
+        "outcome": "After a member votes, an included submission/Q&A/resolution/deadline changes: old vote/acts become permanent non-counting history, empty linked vote opens with per-eligible notices/delivery events, old stages/proxies fail, still-eligible prior principals receive persistent `revote_required` with old/new hashes, changed classes, deadline and refs, and ineligible principals receive information but no impossible action."
+      },
+      {
+        "id": "AC-16",
+        "outcome": "Secretary contributes an unverified canonical transcript annex, verifies/corrects versions, links meeting Q&A, and minutes correction invalidates old signature state without storing recordings/transcribing."
+      },
+      {
+        "id": "AC-17",
+        "outcome": "Soft-delete hides a record from ordinary surfaces but export/chain retains snapshot/tombstone forever; no physical purge tool/job/DB privilege exists."
+      },
+      {
+        "id": "AC-18",
+        "outcome": "After one secure enrollment, ordinary client reconnect silently rotates refresh; passkey appears only at absolute/risk boundary and secretary is not involved."
+      },
+      {
+        "id": "AC-19",
+        "outcome": "Encrypted off-host backup plus WAL restores to clean VPS; every content hash, migration, chain/checkpoint, certificate and role invariant verifies before readiness."
+      },
+      {
+        "id": "AC-20",
+        "outcome": "Public certificate endpoint resists enumeration/disclosure, recomputes persisted truth, detects DB tamper, while offline verification remains stateless."
+      },
+      {
+        "id": "AC-21",
+        "outcome": "Secretary's agent logs structured action items (or exact none) from the current minutes. A changed package supersedes stale drafts. Exact finalization binds/activates/notifies one manifest; owner submits canonical evidence; rejection persists; secretary freshly closes; a correction creates a linked task cycle while completed original remains terminal."
+      },
+      {
+        "id": "AC-22",
+        "outcome": "Member and observer agents submit strict anchored JSON comments/redlines only during published review; an author withdraws a pending comment without deletion; every other item is dispositioned; signature freeze rejects late review. Both roles sign exact package; nonfinal correction returns to review and drives exact re-sign lifecycle; finalized correction creates a linked aggregate without rewriting the original."
+      },
+      {
+        "id": "AC-23",
+        "outcome": "A company administrator proposes another eligible human, who personally accepts and reconnects; atomic transfer ends old admin authority while preserving ordinary rights and history."
+      },
+      {
+        "id": "AC-24",
+        "outcome": "A senior secretary receives an expiring exact-board director-management grant, completes an evidenced appointment and is denied other boards, privileged targets and onward delegation."
+      },
+      {
+        "id": "AC-25",
+        "outcome": "Supported bootstrap, upgrade, recovery, revocation and restore preserve administrative authority and allow separated secretary/director client identities without fabricated human consent."
+      }
+    ],
+    "verificationTiers": [
+      {
+        "id": "T0",
+        "name": "integrity",
+        "requiredTarget": "lockfile, source, generated registries, migrations, container context",
+        "threshold": "100% deterministic; no drift",
+        "releaseRule": "any drift or undeclared generated diff blocks"
+      },
+      {
+        "id": "T1",
+        "name": "static",
+        "requiredTarget": "format, ESLint, strict TS, dependency architecture, forbidden imports/config/egress",
+        "threshold": "100% pass; zero warning waivers",
+        "releaseRule": "any failure blocks"
+      },
+      {
+        "id": "T2",
+        "name": "unit/state",
+        "requiredTarget": "every branch of domain, canonicalization, policy and state machines",
+        "threshold": "critical packages 100% branches; overall ≥90% branches and ≥95% lines",
+        "releaseRule": "any critical uncovered branch blocks"
+      },
+      {
+        "id": "T3",
+        "name": "property",
+        "requiredTarget": "tally/quorum/proxy/ruleset/canonical/event invariants",
+        "threshold": "≥100,000 seeded cases plus exhaustive bounded small state spaces",
+        "releaseRule": "one counterexample blocks; seed/case retained forever"
+      },
+      {
+        "id": "T4",
+        "name": "mutation",
+        "requiredTarget": "critical domain/authz/consent/audit/certificate packages",
+        "threshold": "100% non-equivalent mutants killed",
+        "releaseRule": "any surviving non-equivalent mutant blocks"
+      },
+      {
+        "id": "T5",
+        "name": "PostgreSQL",
+        "requiredTarget": "real supported PostgreSQL 18.6, RLS, migrations, races, crash injection",
+        "threshold": "100% required cases; zero skipped",
+        "releaseRule": "unavailable DB blocks release"
+      },
+      {
+        "id": "T6",
+        "name": "protocol/auth",
+        "requiredTarget": "real modular MCP clients, legacy read client, OAuth AS, browser WebAuthn/TOTP/OIDC",
+        "threshold": "100% positive/negative matrix",
+        "releaseRule": "any silent fallback/downgrade blocks"
+      },
+      {
+        "id": "T7",
+        "name": "adversarial",
+        "requiredTarget": "every TH row below against a running instance",
+        "threshold": "100%; safe failure plus required event",
+        "releaseRule": "any unexecuted or unsafe scenario blocks"
+      },
+      {
+        "id": "T8",
+        "name": "acceptance",
+        "requiredTarget": "every AC row below, real MCP SDK client and real services",
+        "threshold": "100%",
+        "releaseRule": "any scenario failure blocks"
+      },
+      {
+        "id": "T9",
+        "name": "operations",
+        "requiredTarget": "image, Compose/VPS, backup/restore, upgrade, load, SBOM/license/vulnerability",
+        "threshold": "100%; zero untriaged critical/high vulnerability",
+        "releaseRule": "unavailable restore or scan blocks"
+      },
+      {
+        "id": "T10",
+        "name": "independent review",
+        "requiredTarget": "external security review for public production label",
+        "threshold": "zero unresolved critical/high; medium disposition recorded",
+        "releaseRule": "absence permits private beta only, never public-production claim"
+      }
+    ]
+  }
+}

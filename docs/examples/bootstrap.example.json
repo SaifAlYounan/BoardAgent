@@ -1,0 +1,25 @@
+{
+  "organizationLegalName": "Example Holdings Limited",
+  "organizationDisplayName": "Example Holdings",
+  "organizationSlug": "example-holdings",
+  "timezone": "Etc/UTC",
+  "boardSlug": "main-board",
+  "boardName": "Main Board",
+  "boardCanonicalPayload": {
+    "schemaVersion": "boardagent.board-charter.v1",
+    "title": "Example synthetic board charter",
+    "source": "operator-supplied synthetic example"
+  },
+  "firstSecretaryLegalName": "Example Secretary",
+  "firstSecretaryDisplayName": "Secretary",
+  "votingWeight": 1,
+  "supportName": "Deployment administrator",
+  "supportContactMethods": [
+    {
+      "method": "private_channel",
+      "value": "replace-with-an-agreed-private-support-route"
+    }
+  ],
+  "onboardingTermsText": "Synthetic example only. Replace this with the deployment's reviewed onboarding terms before bootstrap.",
+  "invitationHandoffMethod": "Verified private out-of-band handoff"
+}

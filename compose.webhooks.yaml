@@ -1,0 +1,10 @@
+# Optional network attachment for the webhook capability. See runbook 18.
+# Selecting this overlay does not enable delivery in application configuration.
+services:
+  worker:
+    networks: [backend, webhook-egress]
+
+networks:
+  webhook-egress:
+    driver: bridge
+    internal: false

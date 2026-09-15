@@ -1,0 +1,21 @@
+{
+  "extends": "../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": "..",
+    "outDir": "dist",
+    "tsBuildInfoFile": "dist/.tsbuildinfo",
+    "types": ["node", "vitest"]
+  },
+  "references": [
+    { "path": "../lib/contracts" },
+    { "path": "../lib/domain" },
+    { "path": "../lib/ruleset" },
+    { "path": "../lib/audit" },
+    { "path": "../lib/authz" },
+    { "path": "../lib/config" },
+    { "path": "../lib/db" },
+    { "path": "../artifacts/server" },
+    { "path": "../scripts" }
+  ],
+  "include": ["**/*.ts", "../artifacts/server/src/oidc-provider.d.ts"]
+}

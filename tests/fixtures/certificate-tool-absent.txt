@@ -1,0 +1,1 @@
+{"data":{"certificate":null},"reference":"01993400-0000-7000-8000-000000000002","resource_uri":null,"schema_version":"boardagent.tool-result.v1","status":"ok","tool":"get_vote_certificate"}

@@ -1,0 +1,23 @@
+{
+  "name": "@boardagent/db",
+  "version": "0.0.0-private-beta",
+  "license": "Apache-2.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "dependencies": {
+    "@boardagent/audit": "workspace:*",
+    "@boardagent/authz": "workspace:*",
+    "@boardagent/contracts": "workspace:*",
+    "@boardagent/domain": "workspace:*",
+    "@boardagent/ruleset": "workspace:*",
+    "drizzle-orm": "0.45.2",
+    "pg": "8.23.0",
+    "zod": "4.4.3"
+  }
+}

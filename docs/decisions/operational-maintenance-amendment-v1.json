@@ -1,0 +1,51 @@
+{
+  "schemaVersion": "boardagent.operational-maintenance-amendment.v1",
+  "id": "operational-maintenance-20260909-v1",
+  "basis": {
+    "path": "docs/decisions/operational-completion-instruction-2026-09-08.md",
+    "sha256": "e8fe4b97ff50c76f601825c81e0edd2c53575a267178c0ccbd412c7139e555e1",
+    "interpretation": "Builder-selected additive engineering under the project owner's instruction to finish secure, auditable, understandable maintenance. This is not a claim that the owner approved the earlier proposal bytes."
+  },
+  "parentRegistryDigest": "7a8607647c451c6594c09a34f6ad7c0a9e80d91a75295ce5bf092a53035878bc",
+  "add": {
+    "cli": [
+      {
+        "commands": ["audit-recovery"],
+        "authorityPath": "Local migrator/operator only; inspect and prepare are read-only, apply binds the exact instance, request digest and observed audit state. Existing implemented recovery preserves original history and permanent missed-deadline findings; no governance or human-consent authority."
+      },
+      {
+        "commands": ["key-lifecycle"],
+        "authorityPath": "Local migrator/operator only; prepare validates exact key identities, dependencies and protected staged files, apply commits the exact maintenance transition and immutable audit receipt, inspect resolves interruption/retry. No agent or company-administrator authority. Registry reservation only until the supported command, five-purpose transitions, restart and restore tests are implemented and qualified."
+      }
+    ],
+    "events": [
+      {
+        "name": "key_lifecycle_changed",
+        "category": "Operator key maintenance"
+      }
+    ]
+  },
+  "expectedCounts": {
+    "tools": 151,
+    "readTools": 58,
+    "directTools": 30,
+    "humanConfirmedTools": 63,
+    "resourceTemplates": 16,
+    "prompts": 7,
+    "httpAuthorityFamilies": 11,
+    "cliRows": 10,
+    "cliCommands": 11,
+    "events": 137,
+    "securityRequirements": 102,
+    "threats": 71,
+    "acceptanceScenarios": 25,
+    "verificationTiers": 11
+  },
+  "verification": {
+    "existingRequirements": ["SR-028", "SR-068", "SR-082"],
+    "existingThreats": ["TH-40"],
+    "thresholdChanges": [],
+    "status": "Registry addition is independently testable; lifecycle runtime, SQL authority, strict event payload, interrupted apply, restart and old/new encrypted recovery remain implementation requirements, not passes."
+  },
+  "preservation": "All frozen rows, the prior administrative amendment and its pins remain unchanged. audit-recovery records the already implemented operator command omitted from the earlier CLI inventory. The added lifecycle event does not itself confer database write authority."
+}

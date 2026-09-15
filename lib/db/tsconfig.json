@@ -1,0 +1,16 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "rootDir": "src",
+    "outDir": "dist",
+    "tsBuildInfoFile": "dist/.tsbuildinfo"
+  },
+  "references": [
+    { "path": "../contracts" },
+    { "path": "../domain" },
+    { "path": "../ruleset" },
+    { "path": "../audit" },
+    { "path": "../authz" }
+  ],
+  "include": ["src/**/*.ts"]
+}

@@ -1,0 +1,1 @@
+{"data":{"items":[],"next_cursor":null},"reference":null,"resource_uri":null,"schema_version":"boardagent.tool-result.v1","status":"ok","tool":"list_approval_rule_templates"}

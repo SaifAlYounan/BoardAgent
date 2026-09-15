@@ -1,0 +1,1 @@
+{"data":{"draft":null},"reference":"01993700-0000-7000-8000-000000000010","resource_uri":null,"schema_version":"boardagent.tool-result.v1","status":"ok","tool":"resume_draft"}

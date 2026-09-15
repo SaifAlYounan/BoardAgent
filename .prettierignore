@@ -1,0 +1,15 @@
+node_modules
+dist
+coverage
+.stryker-tmp
+tmp
+planning
+BUILD_PLAN.md
+PLANNING_DRAFT.md
+vendor/openboard
+artifacts/verification
+artifacts/review
+artifacts/sbom
+artifacts/license-report
+artifacts/vulnerability
+pnpm-lock.yaml

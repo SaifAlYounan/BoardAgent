@@ -1,0 +1,26 @@
+{
+  "profile_id": "01993500-0000-7000-8000-000000000001",
+  "board_id": "01993500-0000-7000-8000-000000000002",
+  "version": 1,
+  "state": "draft",
+  "schema_version": "boardagent.governance-profile.v1",
+  "canonical_payload": {
+    "threshold": 0.5,
+    "nested": [
+      [],
+      {
+        "note": "Synthetic Δ 🙂\\\"\n\u0001"
+      }
+    ]
+  },
+  "sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "source_agreement_references": [
+    {
+      "reference": "Agreement Δ",
+      "clauses": ["1", "2"]
+    }
+  ],
+  "supersedes_id": null,
+  "created_at": "2026-09-12T11:00:00.000000Z",
+  "activated_at": null
+}

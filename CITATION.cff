@@ -1,0 +1,11 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+title: "BoardAgent"
+type: software
+authors:
+  - family-names: "Kirillov"
+    given-names: "Alexios"
+repository-code: "https://github.com/SaifAlYounan/BoardAgent"
+url: "https://github.com/SaifAlYounan/BoardAgent"
+license: Apache-2.0
+abstract: "A self-hosted, MCP-native board-governance system of record in which directors, the secretariat and management act through their own agents, every binding act is a human confirmation, and every event is hash-chained and signed."

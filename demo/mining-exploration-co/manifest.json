@@ -1,0 +1,139 @@
+{
+  "schemaVersion": "boardagent.synthetic-source-pack.v1",
+  "company": "Mining Exploration Co.",
+  "synthetic": true,
+  "notSeeded": true,
+  "secretaries": 1,
+  "votingMembers": 3,
+  "demoAccounts": 4,
+  "documents": [
+    {
+      "reference": "MEC-00-company",
+      "file": "documents/MEC-00-company.md",
+      "title": "Mining Exploration Co. \u2014 company brief",
+      "stage": "foundation",
+      "bytes": 932,
+      "sha256": "91d8f229442adee96d428584238b9a14735d94143aba3ab756bd5239149525d6"
+    },
+    {
+      "reference": "MEC-01-charter",
+      "file": "documents/MEC-01-charter.md",
+      "title": "Synthetic board charter",
+      "stage": "foundation",
+      "bytes": 3298,
+      "sha256": "f34495d6d41ccc9c9107957b022d6c75e85d2a2d22fbb7ee31a5fba2dd20c65f"
+    },
+    {
+      "reference": "MEC-02-role-register",
+      "file": "documents/MEC-02-role-register.md",
+      "title": "Four demo identities and responsibilities",
+      "stage": "foundation",
+      "bytes": 1401,
+      "sha256": "f9809b9c2c3200d06f03b44ff6f356e413939beef9535c5093715ff3dec54400"
+    },
+    {
+      "reference": "MEC-03-programme",
+      "file": "documents/MEC-03-programme.md",
+      "title": "Kestrel exploration programme",
+      "stage": "initial_input",
+      "bytes": 694,
+      "sha256": "f4f5b2ddd7244d3b5bc3f7a31fefbfdb897691ae8846af5afab6b4b6d17a7c33"
+    },
+    {
+      "reference": "MEC-04-finance",
+      "file": "documents/MEC-04-finance.md",
+      "title": "Cash and programme reconciliation",
+      "stage": "initial_input",
+      "bytes": 895,
+      "sha256": "57dd399b79036fe99582bf781c555d6ea65f51ec190de1c02712e8dbf49b4805"
+    },
+    {
+      "reference": "MEC-05-risk",
+      "file": "documents/MEC-05-risk.md",
+      "title": "Risk and assay status",
+      "stage": "initial_input",
+      "bytes": 613,
+      "sha256": "6926def7b54659bbc0f33956e169e0e02fe05451717df9a55adcd54c064a633f"
+    },
+    {
+      "reference": "MEC-06-extension-v1",
+      "file": "documents/MEC-06-extension-v1.md",
+      "title": "Extension proposal \u2014 first version",
+      "stage": "initial_input",
+      "bytes": 528,
+      "sha256": "b4ee997ba859f11184957640e29023c675bd6f1cfc63cc3571bd0698ac1fa9d3"
+    },
+    {
+      "reference": "MEC-07-extension-v2",
+      "file": "documents/MEC-07-extension-v2.md",
+      "title": "Extension proposal \u2014 revised version",
+      "stage": "withheld_revision",
+      "bytes": 572,
+      "sha256": "25431e5147504c5bac2186de60558b574176aab5b4aadc0b638ff41a7a316d0e"
+    },
+    {
+      "reference": "MEC-08-cash-answer",
+      "file": "documents/MEC-08-cash-answer.md",
+      "title": "Answer to the cash-impact question",
+      "stage": "withheld_answer",
+      "bytes": 592,
+      "sha256": "abef7de9b6fa74eeccdf72bcb0b3734398265657b4d660aa8c3b0e095c30043d"
+    },
+    {
+      "reference": "MEC-09-agenda",
+      "file": "documents/MEC-09-agenda.md",
+      "title": "Trial board meeting agenda",
+      "stage": "initial_input",
+      "bytes": 662,
+      "sha256": "6c098f61de68f486f67c703f437c6421160c528ca550d88e44158a0abc0fd0a3"
+    },
+    {
+      "reference": "MEC-10-minutes-draft",
+      "file": "documents/MEC-10-minutes-draft.md",
+      "title": "Draft minutes for review",
+      "stage": "review_exercise",
+      "bytes": 793,
+      "sha256": "df10b1a9558e28284e98406ae932508be784de858279d3bfc430f052f3645766"
+    },
+    {
+      "reference": "MEC-11-comment",
+      "file": "documents/MEC-11-comment.md",
+      "title": "Board member review note",
+      "stage": "review_exercise",
+      "bytes": 565,
+      "sha256": "2d2649d20682ace42b51efba872cad942aee260c5b42b2fb27e1bf9bf2971dcb"
+    },
+    {
+      "reference": "MEC-12-transcript",
+      "file": "documents/MEC-12-transcript.md",
+      "title": "Unverified transcript annex",
+      "stage": "initial_input",
+      "bytes": 674,
+      "sha256": "6379cf467ebdcdff2770806d656ad5e0cdcde36bf8cfd7222656fdc02c7da270"
+    },
+    {
+      "reference": "MEC-13-conflict",
+      "file": "documents/MEC-13-conflict.md",
+      "title": "Contractor interest disclosure",
+      "stage": "withheld_conflict",
+      "bytes": 547,
+      "sha256": "4521c4bb1988be2ead0b37ff827faba2ad47c983a00945ccc6618ae5bb76ad44"
+    },
+    {
+      "reference": "MEC-14-action-evidence",
+      "file": "documents/MEC-14-action-evidence.md",
+      "title": "Contractor comparison supplied by action owner",
+      "stage": "withheld_evidence",
+      "bytes": 603,
+      "sha256": "401389f3341663b95bf666a528a7b0f99964393aedc6bdf1b73de8a05a86faa1"
+    },
+    {
+      "reference": "MEC-15-qa-update",
+      "file": "documents/MEC-15-qa-update.md",
+      "title": "Later synthetic QA evidence",
+      "stage": "withheld_evidence",
+      "bytes": 558,
+      "sha256": "0400fc85fe801aed8f5f326b6cccac79e814309dc6720323d2ffd2b6f9cbd134"
+    }
+  ]
+}

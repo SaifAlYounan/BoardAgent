@@ -1,0 +1,68 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-09-05T02:33:58+04:00",
+  "buildHost": "darwin-arm64",
+  "node": {
+    "version": "24.20.0",
+    "distribution": "node-v24.20.0-darwin-arm64",
+    "source": "https://nodejs.org/dist/v24.20.0/",
+    "executableSha256": "9d050fd455b56426e25d4d603c7c501cbb2630348e836cf221dcce748e90588a"
+  },
+  "pnpm": {
+    "version": "11.24.0",
+    "packageManager": "pnpm@11.24.0",
+    "provisioner": "corepack"
+  },
+  "vulnerabilityScanner": {
+    "name": "Trivy",
+    "version": "0.74.0",
+    "image": "aquasec/trivy@sha256:62b1e65e8869bc4b4c6aa4fa2b21595256c7c2f6018a9d9ad61caf87187c1969"
+  },
+  "browserHarness": {
+    "runner": "playwright",
+    "runnerVersion": "1.62.1",
+    "browser": "Chrome Headless Shell",
+    "browserVersion": "151.0.7922.34",
+    "revision": "1234",
+    "executableSha256": "7687bff7cb2db075f250e6d5848bbc8838cac3802ac3952a899c574f8eccab45",
+    "source": "playwright-core@1.62.1/browsers.json"
+  },
+  "mcpCompatibility": {
+    "primaryProtocol": "2026-07-28",
+    "legacyProtocol": "2025-11-25",
+    "conformanceSdk": {
+      "packages": [
+        "@modelcontextprotocol/client",
+        "@modelcontextprotocol/core",
+        "@modelcontextprotocol/node",
+        "@modelcontextprotocol/server"
+      ],
+      "version": "2.0.0"
+    },
+    "releasedClients": [
+      {
+        "name": "mcporter",
+        "packageVersion": "0.13.7",
+        "profile": "modern",
+        "integrity": "sha512-+xfZwrFv+oO0YOyHUQzyBRaOGomJhMWPtoINGfY6rtEk7s4jW6T+osnjPr/1XAmIpN8J0/P03XiLnTIUkltPzg==",
+        "proof": "tests/protocol/released-client-matrix.spec.ts"
+      },
+      {
+        "name": "OpenClaw",
+        "releaseTag": "v2026.7.1-2",
+        "packageVersion": "2026.7.1",
+        "embeddedSdkVersion": "1.29.0",
+        "profile": "legacy-read-only",
+        "integrity": "sha512-ge/Xss99CHAjPL/ikmH/UFoiOrjcxDB4sW3y9mhyCD+dYW3wzV7TKbAVdkrXFgAG2d2BjpJofP97zUZ+umxo8g==",
+        "proof": "tests/protocol/released-client-matrix.spec.ts"
+      }
+    ]
+  },
+  "lockfileSha256": "d555b68e18ad2fc49389741647c74e77a8ed03e19746b7e5db1f9be24a247e80",
+  "lockfileRevalidation": {
+    "capturedAt": "2026-09-05T23:46:24.781612+00:00",
+    "reason": "Audit inherited repair adds only the @boardagent/domain workspace edge to @boardagent/audit. External package resolutions unchanged.",
+    "verification": "SBOM and license evidence regenerated with cached pnpm 11.24.0 through the documented task-local adapter; generated outputs unchanged. Node executable hash rechecked.",
+    "generator": "scripts/src/generate-supply-chain.ts"
+  }
+}

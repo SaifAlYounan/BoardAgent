@@ -1,0 +1,1 @@
+{"data":{"items":[],"next_cursor":null,"total_visible":0},"reference":null,"resource_uri":null,"schema_version":"boardagent.tool-result.v1","status":"ok","tool":"list_management_questions"}

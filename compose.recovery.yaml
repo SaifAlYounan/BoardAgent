@@ -1,0 +1,147 @@
+services:
+  wal-staging-init:
+    image: ${POSTGRES_IMAGE:-boardagent-postgres:local}
+    user: "0:0"
+    command: ["sh", "-ec", "install -d -o 70 -g 10001 -m 2770 /wal-staging"]
+    volumes:
+      - wal-staging:/wal-staging
+    read_only: true
+    cap_drop: [ALL]
+    cap_add: [CHOWN, DAC_OVERRIDE, FOWNER, FSETID]
+    security_opt:
+      - no-new-privileges:true
+    restart: "no"
+    networks: [backend]
+
+  recovery-secret-init:
+    image: ${RELEASE_IMAGE:-boardagent:local}
+    user: "0:0"
+    entrypoint: ["sh", "-ec"]
+    command:
+      - install -d -o 10001 -g 10001 -m 0700 /target && install -o 10001 -g 10001 -m 0400 /source/backup_kek /target/backup_kek && install -o 10001 -g 10001 -m 0400 /source/database_password /target/backup_database_password
+    volumes:
+      - recovery-secrets:/target
+    secrets:
+      - source: backup_kek
+        target: /source/backup_kek
+      - source: recovery_database_password
+        target: /source/database_password
+    read_only: true
+    cap_drop: [ALL]
+    cap_add: [CHOWN, DAC_OVERRIDE, FOWNER]
+    security_opt:
+      - no-new-privileges:true
+    restart: "no"
+    networks: [backend]
+
+  backup-key-check:
+    image: ${RELEASE_IMAGE:-boardagent:local}
+    command: ["node", "scripts/dist/operator.js", "check-backup-key"]
+    environment:
+      BOARDAGENT_ENV: production
+      BOARDAGENT_ORGANIZATION_ID: ${BOARDAGENT_ORGANIZATION_ID:?set the registered organization UUIDv7}
+      BOARDAGENT_BACKUP_KEY_ID: ${BACKUP_KEY_ID:?set a registered backup key UUIDv7}
+      BOARDAGENT_BACKUP_KEK_FILE: /run/boardagent-secrets/backup_kek
+      BOARDAGENT_BACKUP_KEY_REGISTRATION_FILE: /run/boardagent-key-receipts/${BACKUP_KEY_ID}.json
+    depends_on:
+      recovery-secret-init:
+        condition: service_completed_successfully
+    volumes:
+      - recovery-secrets:/run/boardagent-secrets:ro
+      - backup-key-receipts:/run/boardagent-key-receipts:ro
+    user: "10001:10001"
+    read_only: true
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
+    restart: "no"
+    network_mode: none
+
+  postgres:
+    group_add: ["10001"]
+    command:
+      - postgres
+      - -c
+      - archive_mode=on
+      - -c
+      - archive_timeout=900s
+      - -c
+      - wal_keep_size=2048MB
+      - -c
+      - archive_command=sh /usr/local/bin/boardagent-archive-wal %p %f
+      - -c
+      - hba_file=/opt/boardagent/pg_hba.conf
+    depends_on:
+      wal-staging-init:
+        condition: service_completed_successfully
+      backup-key-check:
+        condition: service_completed_successfully
+    volumes:
+      - wal-staging:/wal-staging
+      - ./ops/postgres/archive-wal.sh:/usr/local/bin/boardagent-archive-wal:ro
+      - ./ops/postgres/pg_hba.conf:/opt/boardagent/pg_hba.conf:ro
+
+  wal-archiver:
+    image: ${RELEASE_IMAGE:-boardagent:local}
+    command:
+      - node
+      - scripts/dist/operator.js
+      - archive-wal
+      - /wal-staging
+      - /recovery/wal
+    environment:
+      BOARDAGENT_ENV: production
+      BOARDAGENT_BACKUP_DATABASE_URL: postgresql://boardagent_backup_login@postgres:5432/boardagent
+      BOARDAGENT_ORGANIZATION_ID: ${BOARDAGENT_ORGANIZATION_ID:?set the registered organization UUIDv7}
+      BOARDAGENT_BACKUP_DATABASE_PASSWORD_FILE: /run/boardagent-secrets/backup_database_password
+      BOARDAGENT_BACKUP_KEY_ID: ${BACKUP_KEY_ID:?set a registered backup key UUIDv7}
+      BOARDAGENT_BACKUP_KEK_FILE: /run/boardagent-secrets/backup_kek
+      BOARDAGENT_BACKUP_KEY_REGISTRATION_FILE: /run/boardagent-key-receipts/${BACKUP_KEY_ID}.json
+    depends_on:
+      maintenance-lock-init:
+        condition: service_completed_successfully
+      recovery-secret-init:
+        condition: service_completed_successfully
+      backup-key-check:
+        condition: service_completed_successfully
+      postgres:
+        condition: service_started
+    user: "10001:10001"
+    read_only: true
+    tmpfs:
+      - /tmp:size=32m,mode=1777
+    volumes:
+      - maintenance-coordination:/run/boardagent-maintenance:ro
+      - wal-staging:/wal-staging
+      - recovery-secrets:/run/boardagent-secrets:ro
+      - backup-key-receipts:/run/boardagent-key-receipts:ro
+      - type: bind
+        source: ${RECOVERY_ROOT:?mount operator-selected off-host recovery storage}
+        target: /recovery
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
+    restart: unless-stopped
+    stop_grace_period: 30s
+    healthcheck:
+      test:
+        - CMD
+        - node
+        - -e
+        - "const s=JSON.parse(require('node:fs').readFileSync('/tmp/boardagent-wal-status.json','utf8'));process.exit(s.status==='healthy'&&Number.isFinite(s.updatedAt)&&Date.now()>=s.updatedAt&&Date.now()-s.updatedAt<120000?0:1)"
+      interval: 10s
+      timeout: 3s
+      start_period: 10s
+      retries: 2
+    networks: [backend]
+
+volumes:
+  wal-staging:
+  recovery-secrets:
+  backup-key-receipts:
+
+secrets:
+  backup_kek:
+    file: ${BACKUP_KEK_HOST_FILE:?set the private 32-byte backup key file}
+  recovery_database_password:
+    file: ${RECOVERY_DATABASE_PASSWORD_HOST_FILE:?set the private backup database password file}

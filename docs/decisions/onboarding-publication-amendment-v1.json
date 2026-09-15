@@ -1,0 +1,56 @@
+{
+  "schemaVersion": "boardagent.onboarding-publication-amendment.v1",
+  "id": "onboarding-publication-20260910-v1",
+  "parentRegistryDigest": "1362f5dece04d2af4a76216d4eb3c4f37aa316a052178d5380518123f7becf7a",
+  "basis": {
+    "path": "docs/decisions/onboarding-publication-implementation-2026-09-10.md",
+    "sha256": "74ac5ee7f76ec7ea64ce88f7d613b38b674ee48bc2c78429d002bb99ecab1195",
+    "interpretation": "Explicit builder interpretation under delegated completion judgment; D2-028 secretary support duty is frozen, company-admin terms publisher fills unspecified authorship. No original planning edits."
+  },
+  "add": {
+    "tools": [
+      {
+        "name": "publish_secretary_support",
+        "class": "H",
+        "section": "Identity and onboarding",
+        "requiredAuthority": "current board secretary + `S:A`; company admin + `S:A` only for its first support version",
+        "objectRule": "One active same-organization board; latest expected support version; no org-level default; current human eligibility and no board recusal. First version may be initialized by company admin without a seat; later updates require current board secretary authority.",
+        "requiredEvidence": "Exact canonical contact version, protected confirmation, secretary_support_published and immutable preceding versions."
+      },
+      {
+        "name": "publish_onboarding_terms",
+        "class": "H",
+        "section": "Identity and onboarding",
+        "requiredAuthority": "company admin + `S:A`",
+        "objectRule": "Own organization and one supported seat role; latest expected terms version; current human administrative eligibility; grants no board reads.",
+        "requiredEvidence": "Exact canonical terms version, protected confirmation, onboarding_terms_published; fresh own attestation required, no automatic acceptance."
+      }
+    ],
+    "events": [
+      {
+        "name": "secretary_support_published",
+        "category": "Identity and onboarding"
+      },
+      {
+        "name": "onboarding_terms_published",
+        "category": "Identity and onboarding"
+      }
+    ]
+  },
+  "expectedCounts": {
+    "tools": 153,
+    "readTools": 58,
+    "directTools": 30,
+    "humanConfirmedTools": 65,
+    "resourceTemplates": 16,
+    "prompts": 7,
+    "httpAuthorityFamilies": 11,
+    "cliRows": 10,
+    "cliCommands": 11,
+    "events": 139,
+    "securityRequirements": 102,
+    "threats": 71,
+    "acceptanceScenarios": 25,
+    "verificationTiers": 11
+  }
+}

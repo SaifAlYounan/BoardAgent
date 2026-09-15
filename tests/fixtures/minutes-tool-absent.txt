@@ -1,0 +1,1 @@
+{"data":{"minutes":null},"reference":"01993a00-0000-7000-8000-000000000001","resource_uri":null,"schema_version":"boardagent.tool-result.v1","status":"ok","tool":"get_minutes"}

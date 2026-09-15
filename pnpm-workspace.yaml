@@ -1,0 +1,17 @@
+packages:
+  - artifacts/*
+  - lib/*
+  - scripts
+
+allowBuilds:
+  "@google/genai": false
+  esbuild: true
+  libxmljs2: false
+  openclaw: false
+  protobufjs: false
+  tree-sitter-bash: false
+
+catalogMode: strict
+
+patchedDependencies:
+  "@stryker-mutator/core@10.0.0": patches/@stryker-mutator__core@10.0.0.patch

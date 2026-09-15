@@ -1,0 +1,52 @@
+{
+  "schemaVersion": 1,
+  "capturedAt": "2026-09-05T18:52:00+04:00",
+  "source": "docker buildx imagetools inspect against Docker Official Images",
+  "images": [
+    {
+      "purpose": "build-and-runtime",
+      "reference": "node:24.20.0-alpine3.24",
+      "indexDigest": "sha256:e67514e5d0f6c46656005e1b693b2ec9d52e80b641307de684d4a015ba7a4eaf"
+    },
+    {
+      "purpose": "database-base",
+      "reference": "postgres:18.6-alpine3.24",
+      "indexDigest": "sha256:d3e1620b530c944afa6e887d22eb899824da68e19c52024bf98f5220c88a65b2",
+      "derivedTarget": "postgres-runtime"
+    },
+    {
+      "purpose": "optional-https-build",
+      "reference": "golang:1.26.6-alpine3.24",
+      "indexDigest": "sha256:3889b425f035be855a72fb4755265311293b6d414521f0a519d819df32222d83",
+      "upstreamModule": "github.com/caddyserver/caddy/v2@v2.11.4",
+      "upstreamModuleSum": "h1:XKxkMTgNSizEvKG6QHue6cAsFOteU2qA61w2tKkCWi0="
+    },
+    {
+      "purpose": "optional-https-runtime-base",
+      "reference": "alpine:3.24",
+      "indexDigest": "sha256:28bd5fe8b56d1bd048e5babf5b10710ebe0bae67db86916198a6eec434943f8b",
+      "derivedTarget": "caddy-runtime"
+    }
+  ],
+  "supplementalPackages": [
+    {
+      "purpose": "database-security-patch",
+      "name": "libuuid",
+      "version": "2.42.3-r1",
+      "repository": "https://dl-cdn.alpinelinux.org/alpine/v3.24/main",
+      "signatureVerification": "apk verify --keys-dir /etc/apk/keys",
+      "architectures": [
+        {
+          "targetArch": "amd64",
+          "alpineArch": "x86_64",
+          "sha256": "8306e5bb577696c9069fe1dfd9e1dcc39d2d481c6a1b0e707fd03c3e21aa6aa2"
+        },
+        {
+          "targetArch": "arm64",
+          "alpineArch": "aarch64",
+          "sha256": "9ce20c7ffe2ccaa7c321893c10564abbca13c3f2edb82f60a35f1f68e004f86c"
+        }
+      ]
+    }
+  ]
+}

@@ -1,0 +1,66 @@
+{
+  "schemaVersion": "boardagent.public-cimd-transport-receipt.v1",
+  "checkedAt": "2026-09-14T06:37:44.441Z",
+  "clientIdUrl": "https://saifalyounan.github.io/boardagent-transport-check/boardagent/boardagent-transport-check.json",
+  "resolverMode": "production-default",
+  "fetcherMode": "production-default",
+  "timeoutMs": 5000,
+  "resolvedAddresses": [
+    {
+      "address": "2606:50c0:8000::153",
+      "family": 6
+    },
+    {
+      "address": "2606:50c0:8003::153",
+      "family": 6
+    },
+    {
+      "address": "2606:50c0:8002::153",
+      "family": 6
+    },
+    {
+      "address": "2606:50c0:8001::153",
+      "family": 6
+    },
+    {
+      "address": "185.199.110.153",
+      "family": 4
+    },
+    {
+      "address": "185.199.111.153",
+      "family": 4
+    },
+    {
+      "address": "185.199.109.153",
+      "family": 4
+    },
+    {
+      "address": "185.199.108.153",
+      "family": 4
+    }
+  ],
+  "tlsPeer": {
+    "servername": "saifalyounan.github.io",
+    "protocol": "TLSv1.3",
+    "subject": "CN=*.github.io",
+    "issuer": "C=US, O=Let's Encrypt, CN=YR1",
+    "validFrom": "Aug  2 23:38:02 2026 GMT",
+    "validTo": "Oct 31 23:38:01 2026 GMT",
+    "fingerprint256": "71:F1:07:7D:B3:77:FD:7B:8D:68:38:0D:A6:6F:A6:82:38:A3:03:B2:91:1B:CB:77:0B:3B:2A:42:66:93:CF:84",
+    "authorized": true
+  },
+  "metadata": {
+    "clientId": "https://saifalyounan.github.io/boardagent-transport-check/boardagent/boardagent-transport-check.json",
+    "clientName": "BoardAgent public transport check",
+    "redirectUris": ["https://agent-callback.example/callback"],
+    "scopes": ["governance:read", "onboarding:read"],
+    "canonicalSha256": "f0fde17d2808a2276d49bc6577691f2940a1155c298fe7229534a31e05f6918c",
+    "canonicalBytes": 440
+  },
+  "candidate": {
+    "gitCommit": "53ab598cd42919a0b840748a0c4c396025234fee",
+    "sourceTreeSha256": "f7feb80c074cec4d60012e603195dd2d86230747fb477d6b35af536ca8141724",
+    "worktreeClean": true
+  },
+  "node": "v24.20.0"
+}

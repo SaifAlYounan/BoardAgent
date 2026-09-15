@@ -1,0 +1,43 @@
+{
+  "schemaVersion": "boardagent.activation-restart-amendment.v1",
+  "id": "activation-restart-20260913-v1",
+  "status": "approved",
+  "parentRegistryDigest": "c5318e35629312133a4e7d55df9cde7b0bcb15f205e55542927033af7754d920",
+  "basis": {
+    "path": "docs/decisions/activation-restart-proposal-2026-09-13.md",
+    "sha256": "9a0cd82e6ba260dbb42fda33c1cc799b9101cddc2a114d50d66c9dea31ac3092",
+    "interpretation": "The project owner granted authority on 13 September 2026 to design a pending-activation restart ceremony as a proposal to be approved before implementation, and approved the proposal as written the same day. This amendment adds one human-confirmed tool and two events; it preserves D2-013 (ten-minute one-use code, fresh issuer confirmation before any grant), the challenge state machine (the stale challenge ends revoked; the fresh code is a new linked object) and the active-only replacement-passkey recovery policy. It grants no role, seat, scope or activation by itself."
+  },
+  "add": {
+    "tools": [
+      {
+        "name": "reissue_activation",
+        "class": "H",
+        "section": "Identity and onboarding",
+        "requiredAuthority": "company admin + `S:A`; current board secretary + `S:A` for a pending seat on their own board. The first setup administrator's own pending activation is served only by the operator CLI mode `bootstrap reissue-first-activation`.",
+        "objectRule": "Exactly one same-organization member in `pending_activation` with an active registered passkey whose latest activation challenge is expired or exhausted and never consumed; not the caller; no live (issued, unexpired, unexhausted) challenge; the consumed invitation stays consumed. Issues a one-use ten-minute restart handoff; the fresh ten-minute code is minted only after a user-verified assertion with the already-registered passkey.",
+        "requiredEvidence": "Protected confirmation naming the member, the stale challenge and the proofing method; `activation_restart_issued` linking the revoked challenge and the handoff; `activation_restart_completed` linking the handoff and the fresh challenge; the later `confirm_enrollment_activation` binds that fresh challenge. Append-only history."
+      }
+    ],
+    "events": [
+      { "name": "activation_restart_issued", "category": "Identity and onboarding" },
+      { "name": "activation_restart_completed", "category": "Identity and onboarding" }
+    ]
+  },
+  "expectedCounts": {
+    "tools": 154,
+    "readTools": 58,
+    "directTools": 30,
+    "humanConfirmedTools": 66,
+    "resourceTemplates": 16,
+    "prompts": 7,
+    "httpAuthorityFamilies": 11,
+    "cliRows": 10,
+    "cliCommands": 11,
+    "events": 141,
+    "securityRequirements": 102,
+    "threats": 71,
+    "acceptanceScenarios": 25,
+    "verificationTiers": 11
+  }
+}

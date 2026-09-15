@@ -1,0 +1,27 @@
+{
+	admin off
+	auto_https disable_redirects
+}
+
+{$BOARDAGENT_DOMAIN} {
+	encode zstd gzip
+	reverse_proxy server:8787
+
+	# Proxy defaults only: `?` sets a header when the application left it unset, so the
+	# application's own security headers always reach the browser unchanged. The auth pages
+	# need `Referrer-Policy: same-origin` (Chromium sends `Origin: null` on their form
+	# submissions under `no-referrer`, and the CSRF origin check then refuses the login).
+	# One directive per header: several `?` defaults in one block apply only when every
+	# listed header is absent, so one application header would suppress all the defaults.
+	header ?Strict-Transport-Security "max-age=31536000; includeSubDomains"
+	header ?X-Content-Type-Options "nosniff"
+	header ?X-Frame-Options "DENY"
+	header ?Referrer-Policy "no-referrer"
+	header ?Permissions-Policy "camera=(), geolocation=(), microphone=()"
+	header -Server
+
+	log {
+		output stdout
+		format json
+	}
+}

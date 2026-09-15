@@ -1,0 +1,10 @@
+{
+  "client_id": "https://saifalyounan.github.io/boardagent-transport-check/boardagent/boardagent-transport-check.json",
+  "client_name": "BoardAgent public transport check",
+  "redirect_uris": ["https://agent-callback.example/callback"],
+  "grant_types": ["authorization_code", "refresh_token"],
+  "response_types": ["code"],
+  "token_endpoint_auth_method": "none",
+  "scope": "onboarding:read governance:read",
+  "software_id": "boardagent-sr-013-public-transport-check"
+}

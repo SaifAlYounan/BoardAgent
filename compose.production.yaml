@@ -1,0 +1,299 @@
+services:
+  application-secret-init:
+    image: ${RELEASE_IMAGE:?set the exact verified BoardAgent release image}
+    user: "0:0"
+    entrypoint: ["sh", "-ec"]
+    command:
+      - |
+        set -eu
+        umask 077
+        fail() { printf '%s\n' 'secret initialization failed; preserve volumes for inspection' >&2; exit 1; }
+        names() {
+          case "$$1" in
+            initializer) printf '%s\n' database_owner_password database_migrator_password database_server_password database_worker_password database_backup_password ;;
+            operator) printf '%s\n' database_migrator_password oauth_signing_key evidence_signing_key browser_session_key data_kek ;;
+            server) printf '%s\n' database_server_password oauth_signing_key evidence_signing_key browser_session_key data_kek ;;
+            worker) printf '%s\n' database_worker_password evidence_signing_key data_kek ;;
+            postgres) printf '%s\n' database_owner_password ;;
+            *) fail ;;
+          esac
+        }
+        validate_target() {
+          local target allowed entry name
+          target="/$$1-target"
+          allowed=" $$(names "$$1" | tr '\n' ' ')"
+          for entry in "$$target"/* "$$target"/.[!.]* "$$target"/..?*; do
+            [ -e "$$entry" ] || [ -L "$$entry" ] || continue
+            [ -f "$$entry" ] && [ ! -L "$$entry" ] || fail
+            name=$${entry##*/}
+            [ "$$name" = .initialization-incomplete ] && continue
+            name=$${name#.next-}
+            case "$$allowed" in *" $$name "*) ;; *) fail ;; esac
+          done
+        }
+        for name in database_owner_password database_migrator_password database_server_password database_worker_password database_backup_password oauth_signing_key evidence_signing_key browser_session_key data_kek; do
+          source="/run/secrets/$$name"
+          [ -f "$$source" ] && [ ! -L "$$source" ] && [ -s "$$source" ] || fail
+          [ "$$(wc -c < "$$source")" -le 65536 ] || fail
+        done
+        for target in initializer operator server worker postgres; do
+          uid=10001
+          [ "$$target" != postgres ] || uid=70
+          install -d -o "$$uid" -g "$$uid" -m 0700 "/$$target-target" || fail
+          validate_target "$$target"
+        done
+        for target in initializer operator server worker postgres; do
+          : > "/$$target-target/.initialization-incomplete" || fail
+        done
+        sync || fail
+        for target in initializer operator server worker postgres; do
+          uid=10001
+          [ "$$target" != postgres ] || uid=70
+          for name in $$(names "$$target"); do
+            install -o "$$uid" -g "$$uid" -m 0400 "/run/secrets/$$name" "/$$target-target/.next-$$name" || fail
+            cmp -s "/run/secrets/$$name" "/$$target-target/.next-$$name" || fail
+          done
+        done
+        for target in initializer operator server worker postgres; do
+          for name in $$(names "$$target"); do
+            mv -f -- "/$$target-target/.next-$$name" "/$$target-target/$$name" || fail
+          done
+        done
+        sync || fail
+        for target in initializer operator server worker postgres; do
+          rm -- "/$$target-target/.initialization-incomplete" || fail
+        done
+        sync || fail
+    volumes:
+      - initializer-secrets:/initializer-target
+      - operator-secrets:/operator-target
+      - server-secrets:/server-target
+      - worker-secrets:/worker-target
+      - postgres-secrets:/postgres-target
+    secrets:
+      - database_owner_password
+      - database_migrator_password
+      - database_server_password
+      - database_worker_password
+      - database_backup_password
+      - oauth_signing_key
+      - evidence_signing_key
+      - browser_session_key
+      - data_kek
+    read_only: true
+    cap_drop: [ALL]
+    cap_add: [CHOWN, DAC_OVERRIDE, FOWNER]
+    security_opt:
+      - no-new-privileges:true
+    restart: "no"
+    networks: [backend]
+
+  postgres:
+    environment: !override
+      POSTGRES_DB: boardagent
+      POSTGRES_USER: boardagent_owner
+      POSTGRES_PASSWORD_FILE: /run/boardagent-postgres-secrets/database_owner_password
+      PGDATA: /var/lib/postgresql/18/docker
+    depends_on:
+      application-secret-init:
+        condition: service_completed_successfully
+    volumes:
+      - postgres-secrets:/run/boardagent-postgres-secrets:ro
+
+  database-initializer:
+    image: ${RELEASE_IMAGE:?set the exact verified BoardAgent release image}
+    command: ["node", "scripts/dist/operator.js", "migrate"]
+    environment:
+      BOARDAGENT_ENV: production
+      BOARDAGENT_DATABASE_URL: postgresql://boardagent_owner@postgres:5432/boardagent
+      DATABASE_OWNER_PASSWORD_FILE: /run/boardagent-secrets/database_owner_password
+      DATABASE_MIGRATOR_PASSWORD_FILE: /run/boardagent-secrets/database_migrator_password
+      DATABASE_SERVER_PASSWORD_FILE: /run/boardagent-secrets/database_server_password
+      DATABASE_WORKER_PASSWORD_FILE: /run/boardagent-secrets/database_worker_password
+      DATABASE_BACKUP_PASSWORD_FILE: /run/boardagent-secrets/database_backup_password
+    depends_on:
+      application-secret-init:
+        condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
+    user: "10001:10001"
+    read_only: true
+    tmpfs:
+      - /tmp:size=32m,mode=1777
+    volumes:
+      - initializer-secrets:/run/boardagent-secrets:ro
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
+    restart: "no"
+    networks: [backend]
+    profiles: ["initialize"]
+
+  server:
+    environment:
+      BOARDAGENT_ENV: production
+      BOARDAGENT_DATABASE_URL: postgresql://boardagent_server_login@postgres:5432/boardagent
+      BOARDAGENT_DATABASE_PASSWORD_FILE: /run/boardagent-secrets/database_server_password
+    depends_on:
+      application-secret-init:
+        condition: service_completed_successfully
+    volumes:
+      - server-secrets:/run/boardagent-secrets:ro
+
+  worker:
+    environment:
+      BOARDAGENT_ENV: production
+      BOARDAGENT_DATABASE_URL: postgresql://boardagent_worker_login@postgres:5432/boardagent
+      BOARDAGENT_DATABASE_PASSWORD_FILE: /run/boardagent-secrets/database_worker_password
+    depends_on:
+      application-secret-init:
+        condition: service_completed_successfully
+    volumes:
+      - worker-secrets:/run/boardagent-secrets:ro
+
+  operator:
+    image: ${RELEASE_IMAGE:?set the exact verified BoardAgent release image}
+    env_file:
+      - path: ${APP_ENV_FILE:?set the non-secret production environment file}
+        required: true
+    entrypoint: ["node", "scripts/dist/operator.js"]
+    environment:
+      BOARDAGENT_ENV: production
+      BOARDAGENT_DATABASE_URL: postgresql://boardagent_migrator_login@postgres:5432/boardagent
+      BOARDAGENT_DATABASE_PASSWORD_FILE: /run/boardagent-secrets/database_migrator_password
+    depends_on:
+      maintenance-lock-init:
+        condition: service_completed_successfully
+      application-secret-init:
+        condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
+    user: "10001:10001"
+    read_only: true
+    tmpfs:
+      - /tmp:size=32m,mode=1777
+    volumes:
+      - maintenance-coordination:/run/boardagent-maintenance:ro
+      - operator-secrets:/run/boardagent-secrets:ro
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
+    restart: "no"
+    networks: [backend]
+    profiles: ["operator"]
+
+  backup-registration-secret-init:
+    image: ${RELEASE_IMAGE:?set the exact verified BoardAgent release image}
+    profiles: ["backup-key"]
+    user: "0:0"
+    entrypoint: ["sh", "-ec"]
+    command:
+      - |
+        set -eu
+        umask 077
+        fail() { printf '%s\n' 'backup registration secret initialization failed' >&2; exit 1; }
+        for name in database_migrator_password backup_kek; do
+          [ -f "/source/$$name" ] && [ ! -L "/source/$$name" ] && [ -s "/source/$$name" ] || fail
+          [ "$$(wc -c < "/source/$$name")" -le 65536 ] || fail
+        done
+        install -d -o 10001 -g 10001 -m 0700 /target || fail
+        install -d -o 10001 -g 10001 -m 0700 /receipts || fail
+        for entry in /target/* /target/.[!.]* /target/..?*; do
+          [ -e "$$entry" ] || [ -L "$$entry" ] || continue
+          [ -f "$$entry" ] && [ ! -L "$$entry" ] || fail
+          case "$${entry##*/}" in database_migrator_password|backup_kek|.next-database_migrator_password|.next-backup_kek|.initialization-incomplete) ;; *) fail ;; esac
+        done
+        : > /target/.initialization-incomplete || fail
+        sync || fail
+        for name in database_migrator_password backup_kek; do
+          install -o 10001 -g 10001 -m 0400 "/source/$$name" "/target/.next-$$name" || fail
+          cmp -s "/source/$$name" "/target/.next-$$name" || fail
+        done
+        for name in database_migrator_password backup_kek; do
+          mv -f -- "/target/.next-$$name" "/target/$$name" || fail
+        done
+        sync || fail
+        rm -- /target/.initialization-incomplete || fail
+        sync || fail
+    volumes:
+      - backup-registration-secrets:/target
+      - backup-key-receipts:/receipts
+    secrets:
+      - source: database_migrator_password
+        target: /source/database_migrator_password
+      - source: backup_registration_kek
+        target: /source/backup_kek
+    read_only: true
+    cap_drop: [ALL]
+    cap_add: [CHOWN, DAC_OVERRIDE, FOWNER]
+    security_opt:
+      - no-new-privileges:true
+    restart: "no"
+    network_mode: none
+
+  backup-key-registrar:
+    image: ${RELEASE_IMAGE:?set the exact verified BoardAgent release image}
+    profiles: ["backup-key"]
+    entrypoint:
+      - sh
+      - -ec
+      - '[ ! -e /run/boardagent-registration/.initialization-incomplete ] && [ ! -L /run/boardagent-registration/.initialization-incomplete ] && exec node scripts/dist/operator.js "$$@"'
+      - --
+    command: ["register-backup-key"]
+    environment:
+      BOARDAGENT_ENV: production
+      BOARDAGENT_DATABASE_URL: postgresql://boardagent_migrator_login@postgres:5432/boardagent
+      BOARDAGENT_DATABASE_PASSWORD_FILE: /run/boardagent-registration/database_migrator_password
+      BOARDAGENT_ORGANIZATION_ID: ${BOARDAGENT_ORGANIZATION_ID:-}
+      BOARDAGENT_BACKUP_KEY_ID: ${BACKUP_KEY_ID:-}
+      BOARDAGENT_BACKUP_KEK_FILE: /run/boardagent-registration/backup_kek
+      BOARDAGENT_BACKUP_KEY_RECEIPT_DIRECTORY: /var/lib/boardagent/backup-key-receipts
+    depends_on:
+      backup-registration-secret-init:
+        condition: service_completed_successfully
+      postgres:
+        condition: service_healthy
+    user: "10001:10001"
+    read_only: true
+    tmpfs:
+      - /tmp:size=32m,mode=1777
+    volumes:
+      - backup-registration-secrets:/run/boardagent-registration:ro
+      - backup-key-receipts:/var/lib/boardagent/backup-key-receipts
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
+    restart: "no"
+    networks: [backend]
+
+volumes:
+  initializer-secrets:
+  operator-secrets:
+  server-secrets:
+  worker-secrets:
+  postgres-secrets:
+  backup-registration-secrets:
+  backup-key-receipts:
+
+secrets:
+  database_owner_password:
+    file: ${DATABASE_OWNER_PASSWORD_HOST_FILE:?set the owner password file}
+  database_migrator_password:
+    file: ${DATABASE_MIGRATOR_PASSWORD_HOST_FILE:?set the migrator password file}
+  database_server_password:
+    file: ${DATABASE_SERVER_PASSWORD_HOST_FILE:?set the server password file}
+  database_worker_password:
+    file: ${DATABASE_WORKER_PASSWORD_HOST_FILE:?set the worker password file}
+  database_backup_password:
+    file: ${DATABASE_BACKUP_PASSWORD_HOST_FILE:?set the backup password file}
+  oauth_signing_key:
+    file: ${OAUTH_SIGNING_KEY_HOST_FILE:?set the OAuth ES256 private JWK file}
+  evidence_signing_key:
+    file: ${EVIDENCE_SIGNING_KEY_HOST_FILE:?set the evidence Ed25519 private PEM file}
+  browser_session_key:
+    file: ${BROWSER_SESSION_KEY_HOST_FILE:?set the browser-session key file}
+  data_kek:
+    file: ${DATA_KEK_HOST_FILE:?set the data-encryption key file}
+  # Inactive profile renders without this input; activating it fails closed if absent.
+  backup_registration_kek:
+    file: ${BACKUP_KEK_HOST_FILE:-.missing-backup-registration-key}
