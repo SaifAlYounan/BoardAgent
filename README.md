@@ -6,6 +6,33 @@ governance portal and runs no server-side AI. It stores the canonical machine-re
 records and enforces procedure and authority on every operation. Every binding act is a
 human confirmation, and every event is hash-chained and signed.
 
+## A note from the human author
+
+BoardAgent is the board portal of the future. It has no user interface. It accepts no
+PDFs, no Word documents, no PowerPoints. It only accepts machine-readable formats. A
+human cannot log in to the board portal. Only an agent can.
+
+In fact, BoardAgent doesn't even have AI, because BoardAgent is a governance protocol
+for agents managing board workflows.
+
+Each stakeholder (director, secretary, management, observers) talks to their own
+personal AI agent, whichever one they already use, and the agent talks to the board
+portal over MCP. The board portal itself is a server of record: charter, seats,
+permissions, machine-readable papers, questions, votes, minutes, and a signed hash chain
+of everything that happened.
+
+Today's board portals are document viewers with permissions and a black-box chatbot
+bolted on top. Board members are using an AI that they do not control or govern. A
+governance heresy, and a real risk for board members.
+
+I think that in a few years (not that far away from now), they will be what this is: a
+protocol your own agent speaks, with the governance enforced on the server side where no
+model can talk its way past it. This is, in my view, what "AI-native" means.
+
+I have a day job, so you will pardon me. The rest of this README file and the
+documentation is AI-generated. I have reviewed every word of it, but sorry if I hurt
+your feelings with AI-generated content.
+
 ## Status
 
 BoardAgent is an open-source beta. Use it with synthetic data only. It is not
