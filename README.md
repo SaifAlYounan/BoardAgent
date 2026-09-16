@@ -17,9 +17,12 @@ for agents managing board workflows.
 
 Each stakeholder (director, secretary, management, observers) talks to their own
 personal AI agent, whichever one they already use, and the agent talks to the board
-portal over MCP. The board portal itself is a server of record: charter, seats,
-permissions, machine-readable papers, questions, votes, minutes, and a signed hash chain
-of everything that happened.
+portal over MCP. They can then ask their agent to present the materials in whichever
+form they like (including PowerPoint, if they are stuck in 2020).
+
+The board portal itself is a server of record: charter, seats, permissions,
+machine-readable papers, questions, votes, minutes, and a signed hash chain of
+everything that happened.
 
 Today's board portals are document viewers with permissions and a black-box chatbot
 bolted on top. Board members are using an AI that they do not control or govern. A
