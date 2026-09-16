@@ -2,7 +2,7 @@
 
 BoardAgent is a self-hosted, MCP-native system of record for a board of directors. Each
 person on the board works through their own MCP-capable agent. BoardAgent has no
-governance portal and runs no server-side AI. It stores the canonical machine-readable
+human interface and runs no server-side AI. It stores the canonical machine-readable
 records and enforces procedure and authority on every operation. Every binding act is a
 human confirmation, and every event is hash-chained and signed.
 
