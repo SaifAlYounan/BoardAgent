@@ -47,8 +47,7 @@ a shared assistant. Your agent presents information. BoardAgent records exact
 information and the confirmations you give. You remain responsible for reading what
 you confirm and for securing your agent and your local copies.
 
-BoardAgent is not a qualified electronic-signature service or a notary, and it is not
-legal advice. It cannot prove that a person understood a record.
+BoardAgent is not a qualified electronic-signature service or a notary yet, and it is not legal advice. It cannot yet prove that a person understood a record.
 
 ### Binding confirmations need a client that renders forms
 
