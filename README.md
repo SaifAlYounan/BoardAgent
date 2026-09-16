@@ -38,10 +38,8 @@ your feelings with AI-generated content.
 
 ## Status
 
-BoardAgent is an open-source beta. Use it with synthetic data only. It is not
-production-ready, and it carries no security certification. I call this code line the
-private hardened beta: it passes its own regression net, except SR-102, which is still
-unresolved, and it has not passed an independent external review.
+BoardAgent is an open-source beta. It is not
+production-ready, and it does not carry a security certification yet. I call this code line the private hardened beta: it passes its own regression net, except SR-102, which is still unresolved, and it has not passed an independent external review.
 
 I built BoardAgent so that a board can keep its official records in one service that
 its members reach through the agents they already use, without handing those records to
